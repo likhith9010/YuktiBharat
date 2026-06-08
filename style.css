@@ -1,0 +1,228 @@
+/* Custom Styles for Paper-Glass Blog Editor & Publisher */
+
+/* Base Styles */
+body, .bg-paper {
+    background: linear-gradient(to bottom, 
+        rgba(255, 153, 51, 0.18) 0%, 
+        rgba(255, 255, 255, 0.95) 35%, 
+        rgba(255, 255, 255, 0.95) 65%, 
+        rgba(19, 136, 8, 0.18) 100%
+    ) !important;
+    background-attachment: fixed;
+}
+
+/* Realistic Paper Grain Effect */
+.paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.038;
+    mix-blend-mode: multiply;
+}
+
+/* Glassmorphism Panel styles */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.03), 
+        0 2px 4px -1px rgba(0, 0, 0, 0.02),
+        0 10px 30px -10px rgba(0, 0, 0, 0.05);
+}
+
+/* Sidebar Toggle Mechanics */
+#sidebar {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    transform: translateX(-100%);
+    border-right: none !important;
+}
+
+/* Elegant Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.18);
+}
+
+/* Paper Theme Options */
+#paper-sheet.theme-cream {
+    background-color: #FAF8F4;
+}
+#paper-sheet.theme-yellow {
+    background-color: #FFFCE0;
+}
+#paper-sheet.theme-green {
+    background-color: #F0F6F2;
+}
+#paper-sheet.theme-white {
+    background-color: #FFFFFF;
+}
+
+/* The Ruled Notepad Grid */
+#paper-sheet {
+    font-family: 'Lora', Georgia, serif;
+}
+#editor-body {
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 31px,
+        rgba(208, 225, 253, 0.45) 31px,
+        rgba(208, 225, 253, 0.45) 32px
+    );
+    background-size: 100% 32px;
+    background-attachment: local;
+    line-height: 32px;
+    padding-top: 2px;
+    font-family: 'Lora', Georgia, serif;
+}
+
+/* Typography Selection Modifiers */
+.font-serif, font[face="Lora"], span[style*="Lora"] {
+    font-family: 'Lora', Georgia, serif;
+}
+.font-sans, font[face="Outfit"], span[style*="Outfit"] {
+    font-family: 'Outfit', sans-serif;
+}
+.font-hand, font[face="Caveat"], span[style*="Caveat"] {
+    font-family: 'Caveat', cursive;
+    font-size: 1.55rem !important;
+    word-spacing: 1px;
+}
+.font-mono, font[face="JetBrains Mono"], span[style*="JetBrains Mono"] {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem !important;
+}
+
+/* Specific body sizing overrides based on font selection */
+.font-serif #editor-body {
+    font-size: 1.125rem; /* 18px */
+}
+.font-sans #editor-body {
+    font-size: 1.1rem;
+}
+.font-hand #editor-body {
+    font-size: 1.55rem; /* Handwriting needs to be slightly larger */
+    word-spacing: 1px;
+}
+.font-mono #editor-body {
+    font-size: 0.95rem;
+}
+
+/* Paragraph spacing inside contenteditable editor */
+#editor-body p {
+    margin-bottom: 32px; /* Match repeating lines grid */
+    min-height: 32px;
+}
+
+/* Header typography */
+#editor-body h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    line-height: 32px;
+}
+
+#editor-body blockquote {
+    border-left: 4px solid rgba(59, 130, 246, 0.4);
+    padding-left: 1.25rem;
+    color: #475569;
+    font-style: italic;
+    margin-bottom: 32px;
+    margin-top: 16px;
+    min-height: 32px;
+}
+
+/* Customized HTML Block Callouts */
+.callout-box {
+    margin-bottom: 32px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid;
+    backdrop-filter: blur(8px);
+}
+.callout-info {
+    background: rgba(219, 234, 254, 0.35); /* Translucent Blue */
+    border-color: rgba(147, 197, 253, 0.5);
+    color: #1e3a8a;
+}
+.callout-warn {
+    background: rgba(254, 243, 199, 0.35); /* Translucent Amber */
+    border-color: rgba(252, 211, 77, 0.5);
+    color: #78350f;
+}
+
+/* Preformatted Code block */
+#editor-body pre {
+    background: rgba(241, 245, 249, 0.7);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 32px;
+    line-height: 24px;
+    overflow-x: auto;
+}
+
+/* Placeholder styles */
+#editor-title:empty:before,
+#editor-body:empty:before {
+    content: attr(data-placeholder);
+    color: #cbd5e1;
+    cursor: text;
+}
+
+/* Active buttons on tools panel */
+.active-tool-btn {
+    background-color: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Toast Notification (Glassmorphic) */
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity 0.3s ease;
+}
+.toast-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Active sidebar item highlighting */
+.sidebar-item-active {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}

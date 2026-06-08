@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YuktiBharat | Editor Dashboard</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: {
+                            light: '#FCFBF9',
+                            DEFAULT: '#F9F8F6',
+                            dark: '#F3F1ED',
+                            lines: '#E2E8F0',
+                            ruled: '#D0E1FD',
+                            margin: '#FCA5A5'
+                        },
+                        glass: {
+                            bg: 'rgba(255, 255, 255, 0.35)',
+                            border: 'rgba(255, 255, 255, 0.5)',
+                            hover: 'rgba(255, 255, 255, 0.55)',
+                            text: '#2D3748'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        hand: ['Caveat', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Outfit, Lora, JetBrains Mono & Caveat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100">
+
+    <!-- Subtle Paper Grain Overlay -->
+    <div class="paper-grain absolute inset-0 pointer-events-none z-[1]"></div>
+
+    <!-- Main App Container -->
+    <div class="flex w-full h-screen relative z-[2]">
+        
+        <!-- Left Sidebar Navigation (Glassmorphic) -->
+        <aside id="sidebar" class="w-80 h-full glass-panel flex flex-col transition-all duration-300 ease-in-out relative z-30 transform translate-x-0 overflow-hidden">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-white/20 flex flex-col gap-2.5">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center gap-3">
+                        <img src="logo.png" alt="YuktiBharat Logo" class="w-8 h-8 rounded-lg shadow-sm object-cover flex-shrink-0">
+                        <span class="font-bold text-lg tracking-wide text-slate-800">YuktiBharat</span>
+                    </div>
+                    <!-- Hide Sidebar Button -->
+                    <button id="toggle-sidebar-btn" class="p-1.5 rounded-lg hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-colors">
+                        <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <!-- Tagline -->
+                <div class="text-[10px] font-medium text-slate-400 tracking-wider uppercase pl-1.5">
+                    Fixing India with Ideas
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-4">
+                <div class="relative flex items-center">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 text-slate-400"></i>
+                    <input type="text" id="search-posts" placeholder="Search entries..." class="w-full bg-white/40 border border-white/40 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-slate-400 focus:bg-white/60 transition-all placeholder-slate-400">
+                </div>
+            </div>
+
+            <!-- Create New Post Button -->
+            <div class="px-4 pb-2">
+                <button id="new-post-btn" class="w-full py-2.5 px-4 bg-slate-800 text-white rounded-xl font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-700 active:scale-[0.98] transition-all shadow-md">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>New Post</span>
+                </button>
+            </div>
+
+            <!-- Scrollable Post List -->
+            <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar" id="posts-list">
+                <!-- Posts inserted by JavaScript -->
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-white/20 flex items-center justify-between">
+                <button id="settings-btn" class="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/30 transition-all text-sm font-medium">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Publishing Settings</span>
+                </button>
+                <span class="text-xs text-slate-400 font-mono" id="post-count">0 Posts</span>
+            </div>
+        </aside>
+
+        <!-- Floating Sidebar Toggle Trigger (When Left Sidebar is Closed) -->
+        <button id="floating-menu-btn" class="hidden absolute top-4 left-4 z-40 p-2.5 rounded-xl glass-panel shadow-md text-slate-700 hover:bg-white/50 active:scale-95 transition-all">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+
+        <!-- Main Workspace (Editor + Top Bar) -->
+        <main class="flex-1 h-full flex flex-col overflow-hidden relative">
+            
+            <!-- Top Navigation Bar -->
+            <header class="h-16 px-6 glass-panel border-b border-white/20 flex items-center justify-between relative z-20">
+                <div class="flex items-center gap-4">
+                    <div id="header-spacer" class="w-0 transition-all duration-300"></div>
+                    <div id="header-brand" class="flex items-center gap-2.5 opacity-0 w-0 overflow-hidden transition-all duration-300">
+                        <img src="logo.png" alt="YuktiBharat Logo" class="w-7 h-7 rounded-lg shadow-sm object-cover flex-shrink-0">
+                        <span class="font-bold text-base tracking-wide text-slate-800">YuktiBharat</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="save-status" class="text-xs text-slate-400 flex items-center gap-1.5 font-medium bg-white/20 px-2.5 py-1 rounded-full">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block" id="status-dot"></span>
+                            <span id="status-text">Draft</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <button id="download-md-btn" title="Download Markdown" class="p-2 rounded-xl hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-all active:scale-95">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                    </button>
+                    <button id="delete-post-btn" title="Delete Post" class="p-2 rounded-xl hover:bg-red-50 text-red-500 hover:text-red-700 transition-all active:scale-95">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                    <button id="save-btn" class="px-4 py-2 border border-slate-300 hover:bg-white/45 hover:border-slate-400 text-slate-700 rounded-xl font-medium text-sm flex items-center gap-1.5 transition-all active:scale-95" title="Save Draft">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span>Save Draft</span>
+                    </button>
+                    <button id="publish-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium text-sm flex items-center gap-2 shadow-sm transition-all active:scale-95">
+                        <i data-lucide="globe" class="w-4 h-4"></i>
+                        <span>Publish</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Editor Content Area -->
+            <div class="flex-1 overflow-y-auto py-12 px-6 flex justify-center items-start custom-scrollbar bg-paper-dark/30 relative z-10" id="editor-viewport">
+                <!-- Ruled Paper Sheet (WIDENED to max-w-5xl) -->
+                <article id="paper-sheet" class="w-full max-w-5xl min-h-[85vh] bg-paper-light shadow-xl rounded-2xl border border-slate-200/50 flex flex-col relative py-12 transition-all duration-300 theme-cream">
+                    
+                    <!-- Paper Vertical Margin Line (Red) -->
+                    <div class="absolute top-0 bottom-0 left-[79px] w-[1px] bg-red-300 pointer-events-none z-10"></div>
+                    
+                    <div class="flex flex-col flex-1 pl-[96px] pr-12 relative z-20">
+                        <!-- Contenteditable Title -->
+                        <h1 id="editor-title" contenteditable="true" data-placeholder="Enter post title..." class="font-sans font-bold text-4xl mb-8 outline-none text-slate-900 focus:empty:before:content-[attr(data-placeholder)] empty:before:content-[attr(data-placeholder)] empty:before:text-slate-300 leading-tight"></h1>
+                        
+                        <!-- Metadata Line -->
+                        <div class="flex items-center gap-4 text-xs font-mono text-slate-400 mb-6 border-b border-dashed border-slate-200 pb-3" contenteditable="false">
+                            <span id="post-date">June 9, 2026</span>
+                            <span id="word-count">0 words</span>
+                        </div>
+
+                        <!-- Contenteditable Body (Font class applied dynamically to parent paper-sheet) -->
+                        <div id="editor-body" contenteditable="true" data-placeholder="Start typing your story here..." class="text-lg leading-[2rem] outline-none text-slate-800 focus:empty:before:content-[attr(data-placeholder)] empty:before:content-[attr(data-placeholder)] empty:before:text-slate-300 flex-1 min-h-[50vh]"></div>
+                    </div>
+                </article>
+            </div>
+        </main>
+
+        <!-- Right Tools Sidebar Panel (Glassmorphic) -->
+        <aside id="right-sidebar" class="w-64 h-full glass-panel flex flex-col p-5 space-y-6 overflow-y-auto custom-scrollbar border-l border-white/20 relative z-30">
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Notepad Typography</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="font-serif-btn" class="py-2 px-3 bg-white/50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white active:scale-95 transition-all text-left font-serif shadow-sm active-tool-btn">Lora (Serif)</button>
+                    <button id="font-sans-btn" class="py-2 px-3 bg-white/20 border border-transparent rounded-xl text-xs font-semibold text-slate-700 hover:bg-white/45 active:scale-95 transition-all text-left font-sans">Outfit (Sans)</button>
+                    <button id="font-hand-btn" class="py-2 px-3 bg-white/20 border border-transparent rounded-xl text-xs font-semibold text-slate-700 hover:bg-white/45 active:scale-95 transition-all text-left font-hand text-sm">Caveat (Hand)</button>
+                    <button id="font-mono-btn" class="py-2 px-3 bg-white/20 border border-transparent rounded-xl text-xs font-semibold text-slate-700 hover:bg-white/45 active:scale-95 transition-all text-left font-mono">JetBrains</button>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Paper Texture Style</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="theme-cream-btn" class="py-2 px-2.5 bg-amber-50/60 border border-amber-200/80 rounded-xl text-xs font-semibold text-amber-800 hover:bg-amber-50 transition-all flex items-center gap-1.5 shadow-sm active-tool-btn">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#FCFBF9] border border-amber-200 inline-block"></span>
+                        Cream
+                    </button>
+                    <button id="theme-yellow-btn" class="py-2 px-2.5 bg-yellow-50/40 border border-transparent rounded-xl text-xs font-semibold text-yellow-800 hover:bg-yellow-50/80 transition-all flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#FFFDE8] border border-yellow-200 inline-block"></span>
+                        Legal Pad
+                    </button>
+                    <button id="theme-green-btn" class="py-2 px-2.5 bg-emerald-50/40 border border-transparent rounded-xl text-xs font-semibold text-emerald-800 hover:bg-emerald-50/80 transition-all flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded-full bg-[#F4F9F6] border border-emerald-200 inline-block"></span>
+                        Sage
+                    </button>
+                    <button id="theme-white-btn" class="py-2 px-2.5 bg-slate-50/40 border border-transparent rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100/80 transition-all flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded-full bg-white border border-slate-200 inline-block"></span>
+                        White
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Insert Block Element</h3>
+                <div class="flex flex-col gap-2">
+                    <button id="insert-p-btn" class="py-2 px-3 bg-white/30 border border-white/40 hover:bg-white/60 text-slate-700 text-xs font-semibold rounded-xl text-left flex items-center gap-2 transition-all">
+                        <i data-lucide="align-left" class="w-4 h-4 text-slate-500"></i>
+                        <span>Standard Paragraph</span>
+                    </button>
+                    <button id="insert-h2-btn" class="py-2 px-3 bg-white/30 border border-white/40 hover:bg-white/60 text-slate-700 text-xs font-semibold rounded-xl text-left flex items-center gap-2 transition-all">
+                        <i data-lucide="heading-2" class="w-4 h-4 text-slate-500"></i>
+                        <span>Subheading (H2)</span>
+                    </button>
+                    <button id="insert-quote-btn" class="py-2 px-3 bg-white/30 border border-white/40 hover:bg-white/60 text-slate-700 text-xs font-semibold rounded-xl text-left flex items-center gap-2 transition-all">
+                        <i data-lucide="quote" class="w-4 h-4 text-slate-500"></i>
+                        <span>Blockquote Block</span>
+                    </button>
+                    <button id="insert-info-btn" class="py-2 px-3 bg-white/30 border border-white/40 hover:bg-white/60 text-slate-700 text-xs font-semibold rounded-xl text-left flex items-center gap-2 transition-all">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-500"></i>
+                        <span>Info Callout (Blue)</span>
+                    </button>
+                    <button id="insert-warn-btn" class="py-2 px-3 bg-white/30 border border-white/40 hover:bg-white/60 text-slate-700 text-xs font-semibold rounded-xl text-left flex items-center gap-2 transition-all">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+                        <span>Warning Callout (Amber)</span>
+                    </button>
+                    <button id="insert-code-btn" class="py-2 px-3 bg-white/30 border border-white/40 hover:bg-white/60 text-slate-700 text-xs font-semibold rounded-xl text-left flex items-center gap-2 transition-all">
+                        <i data-lucide="code" class="w-4 h-4 text-slate-500"></i>
+                        <span>Preformatted Code Block</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Floating Format Toolbar -->
+    <div id="format-toolbar" class="fixed hidden bg-slate-900/90 text-white rounded-xl px-2.5 py-1.5 shadow-xl backdrop-blur-md border border-white/10 flex items-center gap-1.5 z-50 transition-all duration-200 pointer-events-auto">
+        <button id="btn-bold" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Bold (Ctrl+B)">
+            <i data-lucide="bold" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-italic" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Italic (Ctrl+I)">
+            <i data-lucide="italic" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-heading-1" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Heading 1">
+            <i data-lucide="heading-1" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-heading-2" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Heading 2">
+            <i data-lucide="heading-2" class="w-4 h-4"></i>
+        </button>
+        <div class="w-[1px] h-5 bg-white/20 mx-0.5"></div>
+        <button id="btn-quote" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Blockquote">
+            <i data-lucide="quote" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-ul" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Bullet List">
+            <i data-lucide="list" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-ol" class="p-1.5 rounded-lg hover:bg-white/20 text-slate-200 hover:text-white transition-all" title="Numbered List">
+            <i data-lucide="list-ordered" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Publishing Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white/70 border border-white/50 backdrop-blur-xl p-8 rounded-3xl w-full max-w-lg shadow-2xl mx-4 transform scale-95 transition-transform duration-300 flex flex-col gap-5">
+            <div class="flex items-center justify-between border-b border-slate-200/50 pb-4">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-700"></i>
+                    <h2 class="text-xl font-semibold text-slate-800">Publishing Settings</h2>
+                </div>
+                <button id="close-settings-btn" class="p-1 rounded-lg hover:bg-white/50 text-slate-500 hover:text-slate-800 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Connect your GitHub repository to commit and deploy posts directly to your website. If left unconfigured, posts will remain saved locally on disk and can be exported as Markdown files.
+            </p>
+
+            <form id="settings-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="github-username">GitHub Username</label>
+                    <input type="text" id="github-username" placeholder="e.g. janesmith" class="w-full bg-white/50 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all placeholder-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="github-repo">GitHub Repository</label>
+                    <input type="text" id="github-repo" placeholder="e.g. blog" class="w-full bg-white/50 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all placeholder-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="github-branch">Branch Name</label>
+                    <input type="text" id="github-branch" placeholder="main (default)" class="w-full bg-white/50 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all placeholder-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="github-path">Commit Path</label>
+                    <input type="text" id="github-path" placeholder="_posts/ or content/posts/ (optional)" class="w-full bg-white/50 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all placeholder-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="github-pat">Personal Access Token (PAT)</label>
+                    <input type="password" id="github-pat" placeholder="ghp_..." class="w-full bg-white/50 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all placeholder-slate-400">
+                    <span class="text-[10px] text-slate-400 mt-1 block">Requires the 'repo' scope to write files. Stored strictly in local browser storage.</span>
+                </div>
+
+                <div class="flex items-center gap-3 pt-3">
+                    <button type="button" id="test-connection-btn" class="flex-1 py-2.5 border border-slate-200 hover:border-slate-400 hover:bg-white/50 rounded-xl text-sm font-semibold text-slate-700 transition-all active:scale-[0.98]">
+                        Test Connection
+                    </button>
+                    <button type="submit" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-all active:scale-[0.98]">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Entry -->
+    <script src="app.js"></script>
+</body>
+</html>

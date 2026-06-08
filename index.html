@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Education System : A Start | YuktiBharat</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: {
+                            light: '#FCFBF9',
+                            DEFAULT: '#F9F8F6',
+                            dark: '#F3F1ED',
+                            lines: '#E2E8F0',
+                            ruled: '#D0E1FD',
+                            margin: '#FCA5A5'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        hand: ['Caveat', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100">
+    <!-- Subtle Paper Grain Overlay -->
+    <div class="paper-grain absolute inset-0 pointer-events-none z-[1]"></div>
+
+    <!-- Main App Container -->
+    <div class="flex w-full h-screen relative z-[2]">
+        
+        <!-- Left Sidebar Navigation -->
+        <aside id="sidebar" class="w-80 h-full glass-panel flex flex-col transition-all duration-300 ease-in-out relative z-30 transform translate-x-0 overflow-hidden">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-white/20 flex flex-col gap-2.5">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center gap-3">
+                        <img src="logo.png" alt="YuktiBharat Logo" class="w-8 h-8 rounded-lg shadow-sm object-cover flex-shrink-0">
+                        <span class="font-bold text-lg tracking-wide text-slate-800">YuktiBharat</span>
+                    </div>
+                    <!-- Hide Sidebar Button -->
+                    <button id="toggle-sidebar-btn" class="p-1.5 rounded-lg hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-colors">
+                        <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <!-- Tagline -->
+                <div class="text-[10px] font-medium text-slate-400 tracking-wider uppercase pl-1.5">
+                    Fixing India with Ideas
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-4">
+                <div class="relative flex items-center">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 text-slate-400"></i>
+                    <input type="text" id="search-posts" placeholder="Search entries..." class="w-full bg-white/40 border border-white/40 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-slate-400 focus:bg-white/60 transition-all placeholder-slate-400">
+                </div>
+            </div>
+
+            <!-- Scrollable Post List -->
+            <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar" id="posts-list">
+            <a href="csr.html" class="p-3 rounded-xl border border-transparent cursor-pointer transition-all hover:bg-white/30 flex flex-col gap-1 relative sidebar-item-active">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="font-medium text-sm text-slate-800 truncate pr-2 w-full">Indian Education System : A Start</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                    <span>June 9, 2026</span>
+                </div>
+            </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-white/20 text-center">
+                <span class="text-[10px] text-slate-400 font-mono">&copy; 2026 YuktiBharat</span>
+            </div>
+        </aside>
+
+        <!-- Floating Sidebar Toggle Trigger -->
+        <button id="floating-menu-btn" class="hidden absolute top-4 left-4 z-40 p-2.5 rounded-xl glass-panel shadow-md text-slate-700 hover:bg-white/50 active:scale-95 transition-all">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 h-full flex flex-col overflow-hidden relative">
+            
+            <!-- Top Header Bar -->
+            <header class="h-16 px-6 glass-panel border-b border-white/20 flex items-center justify-between relative z-20">
+                <div class="flex items-center gap-4">
+                    <div id="header-spacer" class="w-0 transition-all duration-300"></div>
+                    <div id="header-brand" class="flex items-center gap-2.5 opacity-0 w-0 overflow-hidden transition-all duration-300">
+                        <img src="logo.png" alt="YuktiBharat Logo" class="w-7 h-7 rounded-lg shadow-sm object-cover flex-shrink-0">
+                        <span class="font-bold text-base tracking-wide text-slate-800">YuktiBharat</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Viewport -->
+            <div class="flex-1 overflow-y-auto py-16 px-8 flex justify-center items-center custom-scrollbar bg-paper-dark/30 relative z-10" id="editor-viewport">
+                <!-- Summary Card Container -->
+                <div class="w-full max-w-3xl flex flex-col gap-6">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white/20 px-2.5 py-1 rounded-full self-start">Featured Story</span>
+                    
+                    <!-- The Preview Card Rectangle with Shadow -->
+                    <div class="bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-2xl rounded-2xl p-10 hover:-translate-y-1 hover:shadow-slate-300/30 transition-all duration-300 flex flex-col gap-6">
+                        <h1 class="font-sans font-extrabold text-3xl text-slate-900 leading-tight">Indian Education System : A Start</h1>
+                        
+                        <div class="flex items-center gap-3 text-xs font-mono text-slate-400 border-b border-dashed border-slate-200 pb-3">
+                            <span>June 9, 2026</span>
+                        </div>
+                        
+                        <p class="text-slate-600 text-lg leading-relaxed">Before we go about fixing Indian Education System especially goverment schools, we should understand the problem to begin with , the problems include Inedequate Funding,&nbsp; Poor Infrastructure, Teacher Shortages, Un / Underqualified Teachers among others . Solving all these issues will take vast ...</p>
+                        
+                        <div class="pt-4">
+                            <a href="csr.html" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-medium text-sm hover:bg-slate-700 active:scale-[0.98] transition-all shadow-md">
+                                <span>Read Full Story</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>            </div>
+        </main>
+    </div>
+
+    <!-- Scripts for Static Readers -->
+    <script>
+        lucide.createIcons();
+
+        // Sidebar Collapse Toggle
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const floatingMenuBtn = document.getElementById('floating-menu-btn');
+        const headerSpacer = document.getElementById('header-spacer');
+        const headerBrand = document.getElementById('header-brand');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            const isClosed = sidebar.classList.contains('collapsed');
+            if (isClosed) {
+                floatingMenuBtn.classList.remove('hidden');
+                headerSpacer.className = 'w-12';
+                if (headerBrand) {
+                    headerBrand.classList.remove('opacity-0', 'w-0');
+                    headerBrand.classList.add('opacity-100', 'w-auto');
+                }
+            } else {
+                floatingMenuBtn.classList.add('hidden');
+                headerSpacer.className = 'w-0';
+                if (headerBrand) {
+                    headerBrand.classList.remove('opacity-100', 'w-auto');
+                    headerBrand.classList.add('opacity-0', 'w-0');
+                }
+            }
+        }
+
+        toggleSidebarBtn.addEventListener('click', toggleSidebar);
+        floatingMenuBtn.addEventListener('click', () => {
+            sidebar.classList.remove('collapsed');
+            floatingMenuBtn.classList.add('hidden');
+            headerSpacer.className = 'w-0';
+            if (headerBrand) {
+                headerBrand.classList.remove('opacity-100', 'w-auto');
+                headerBrand.classList.add('opacity-0', 'w-0');
+            }
+        });
+
+        // Static Search filter
+        document.getElementById('search-posts').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('#posts-list > a').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

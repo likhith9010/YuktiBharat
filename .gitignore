@@ -1,0 +1,14 @@
+# Java compiled classes
+*.class
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Data directory (blog post data - exclude if desired, or include)
+# data/

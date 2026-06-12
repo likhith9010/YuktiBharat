@@ -25,16 +25,16 @@ public class Server {
 
         int port = 8000;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        
+
         // Context handlers
         server.createContext("/api/posts", new PostsApiHandler());
         server.createContext("/", new StaticFileHandler());
-        
+
         server.setExecutor(null); // default executor
         System.out.println("YuktiBharat Blog Editor & Publisher is running!");
         System.out.println("Admin Editor:   http://localhost:" + port + "/editor.html");
         System.out.println("Public Site:    http://localhost:" + port + "/index.html");
-        
+
         // Initial compilation of public site
         try {
             compilePublicIndex();
@@ -53,11 +53,11 @@ public class Server {
             if (pathStr.equals("/")) {
                 pathStr = "/index.html";
             }
-            
+
             Path path = Paths.get("." + pathStr).normalize();
             Path currentDir = Paths.get(".").toAbsolutePath().normalize();
             Path absolutePath = path.toAbsolutePath().normalize();
-            
+
             if (!absolutePath.startsWith(currentDir)) {
                 sendError(exchange, 403, "Forbidden");
                 return;
@@ -116,7 +116,7 @@ public class Server {
             }
 
             String path = exchange.getRequestURI().getPath();
-            
+
             try {
                 if (method.equalsIgnoreCase("GET")) {
                     handleGet(exchange, path);
@@ -173,12 +173,13 @@ public class Server {
                 sendResponse(exchange, 400, "Bad Request: Missing Post ID");
                 return;
             }
-            
+
             String id = segments[3];
             boolean isPublish = segments.length > 4 && segments[4].equalsIgnoreCase("publish");
 
             String body = "";
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))) {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))) {
                 body = reader.lines().collect(Collectors.joining("\n"));
             }
 
@@ -200,7 +201,7 @@ public class Server {
                 return;
             }
             String id = segments[3];
-            
+
             Path dataPath = DATA_DIR.resolve(id + ".json");
             if (Files.exists(dataPath)) {
                 Files.delete(dataPath);
@@ -248,10 +249,12 @@ public class Server {
                 this.font = extractJsonField(json, "font");
                 this.theme = extractJsonField(json, "theme");
                 this.updatedAt = extractJsonField(json, "updatedAt");
-                
-                if (this.font.isEmpty()) this.font = "serif";
-                if (this.theme.isEmpty()) this.theme = "cream";
-                
+
+                if (this.font.isEmpty())
+                    this.font = "serif";
+                if (this.theme.isEmpty())
+                    this.theme = "cream";
+
                 String status = extractJsonField(json, "status");
                 if (!status.equalsIgnoreCase("published")) {
                     this.id = null; // Filter out drafts
@@ -285,21 +288,24 @@ public class Server {
         for (PublishedPost p : posts) {
             boolean isActive = p.id.equals(activePostId);
             String activeClass = isActive ? " sidebar-item-active" : "";
-            html.append("            <a href=\"").append(p.id).append(".html\" class=\"p-3 rounded-xl border border-transparent cursor-pointer transition-all hover:bg-white/30 flex flex-col gap-1 relative").append(activeClass).append("\">\n")
-                .append("                <div class=\"flex items-center justify-between gap-2\">\n")
-                .append("                    <span class=\"font-medium text-sm text-slate-800 truncate pr-2 w-full\">").append(p.title.isEmpty() ? "Untitled Post" : p.title).append("</span>\n")
-                .append("                    <span class=\"w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0\"></span>\n")
-                .append("                </div>\n")
-                .append("                <div class=\"flex items-center justify-between text-[11px] text-slate-400 font-mono\">\n")
-                .append("                    <span>").append(p.date).append("</span>\n")
-                .append("                </div>\n")
-                .append("            </a>\n");
+            html.append("            <a href=\"").append(p.id).append(
+                    ".html\" class=\"p-3 rounded-xl border border-transparent cursor-pointer transition-all hover:bg-white/30 flex flex-col gap-1 relative")
+                    .append(activeClass).append("\">\n")
+                    .append("                <div class=\"flex items-center justify-between gap-2\">\n")
+                    .append("                    <span class=\"font-medium text-sm text-slate-800 truncate pr-2 w-full\">")
+                    .append(p.title.isEmpty() ? "Untitled Post" : p.title).append("</span>\n")
+                    .append("                    <span class=\"w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0\"></span>\n")
+                    .append("                </div>\n")
+                    .append("                <div class=\"flex items-center justify-between text-[11px] text-slate-400 font-mono\">\n")
+                    .append("                    <span>").append(p.date).append("</span>\n")
+                    .append("                </div>\n")
+                    .append("            </a>\n");
         }
 
         if (posts.isEmpty()) {
             html.append("            <div class=\"p-4 text-center text-slate-400 text-xs font-medium\">\n")
-                .append("                No posts published yet.\n")
-                .append("            </div>\n");
+                    .append("                No posts published yet.\n")
+                    .append("            </div>\n");
         }
         return html.toString();
     }
@@ -307,7 +313,7 @@ public class Server {
     // Re-compiles all static pages on publish/delete to keep sidebars synchronized
     private static void recompileAllStaticFiles() throws IOException {
         List<PublishedPost> publishedList = getPublishedPosts();
-        
+
         // Compile each individual published post
         for (PublishedPost post : publishedList) {
             compileStaticPostPage(post, publishedList);
@@ -325,37 +331,44 @@ public class Server {
     }
 
     private static String getExcerpt(String htmlContent, int maxLength) {
-        if (htmlContent == null) return "";
+        if (htmlContent == null)
+            return "";
         // Strip HTML tags
         String plainText = htmlContent.replaceAll("<[^>]*>", " ")
-                                      .replaceAll("\\s+", " ")
-                                      .trim();
+                .replaceAll("\\s+", " ")
+                .trim();
         if (plainText.length() <= maxLength) {
             return plainText;
         }
         return plainText.substring(0, maxLength) + "...";
     }
 
-    private static String getIndexTemplate(String title, String date, String content, String font, String theme, String sidebarHtml, String id) {
+    private static String getIndexTemplate(String title, String date, String content, String font, String theme,
+            String sidebarHtml, String id) {
         String excerpt = getExcerpt(content, 300);
-        
-        String centerHtml = 
-                "                <!-- Summary Card Container -->\n" +
+
+        String centerHtml = "                <!-- Summary Card Container -->\n" +
                 "                <div class=\"w-full max-w-3xl flex flex-col gap-6\">\n" +
-                "                    <span class=\"text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white/20 px-2.5 py-1 rounded-full self-start\">Featured Story</span>\n" +
+                "                    <span class=\"text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white/20 px-2.5 py-1 rounded-full self-start\">Featured Story</span>\n"
+                +
                 "                    \n" +
                 "                    <!-- The Preview Card Rectangle with Shadow -->\n" +
-                "                    <div class=\"bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-2xl rounded-2xl p-10 hover:-translate-y-1 hover:shadow-slate-300/30 transition-all duration-300 flex flex-col gap-6\">\n" +
-                "                        <h1 class=\"font-sans font-extrabold text-3xl text-slate-900 leading-tight\">" + title + "</h1>\n" +
+                "                    <div class=\"bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-2xl rounded-2xl p-10 hover:-translate-y-1 hover:shadow-slate-300/30 transition-all duration-300 flex flex-col gap-6\">\n"
+                +
+                "                        <h1 class=\"font-sans font-extrabold text-3xl text-slate-900 leading-tight\">"
+                + title + "</h1>\n" +
                 "                        \n" +
-                "                        <div class=\"flex items-center gap-3 text-xs font-mono text-slate-400 border-b border-dashed border-slate-200 pb-3\">\n" +
+                "                        <div class=\"flex items-center gap-3 text-xs font-mono text-slate-400 border-b border-dashed border-slate-200 pb-3\">\n"
+                +
                 "                            <span>" + date + "</span>\n" +
                 "                        </div>\n" +
                 "                        \n" +
                 "                        <p class=\"text-slate-600 text-lg leading-relaxed\">" + excerpt + "</p>\n" +
                 "                        \n" +
                 "                        <div class=\"pt-4\">\n" +
-                "                            <a href=\"" + id + ".html\" class=\"inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-medium text-sm hover:bg-slate-700 active:scale-[0.98] transition-all shadow-md\">\n" +
+                "                            <a href=\"" + id
+                + ".html\" class=\"inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-medium text-sm hover:bg-slate-700 active:scale-[0.98] transition-all shadow-md\">\n"
+                +
                 "                                <span>Read Full Story</span>\n" +
                 "                                <i data-lucide=\"arrow-right\" class=\"w-4 h-4\"></i>\n" +
                 "                            </a>\n" +
@@ -399,13 +412,15 @@ public class Server {
                 "    <!-- Google Fonts -->\n" +
                 "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n" +
                 "    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n" +
-                "    <link href=\"https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400..700&display=swap\" rel=\"stylesheet\">\n" +
+                "    <link href=\"https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400..700&display=swap\" rel=\"stylesheet\">\n"
+                +
                 "    <!-- Lucide Icons CDN -->\n" +
                 "    <script src=\"https://unpkg.com/lucide@latest\"></script>\n" +
                 "    <!-- Custom Style Sheet -->\n" +
                 "    <link rel=\"stylesheet\" href=\"style.css\">\n" +
                 "</head>\n" +
-                "<body class=\"bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100\">\n" +
+                "<body class=\"bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100\">\n"
+                +
                 "    <!-- Subtle Paper Grain Overlay -->\n" +
                 "    <div class=\"paper-grain absolute inset-0 pointer-events-none z-[1]\"></div>\n" +
                 "\n" +
@@ -413,21 +428,26 @@ public class Server {
                 "    <div class=\"flex w-full h-screen relative z-[2]\">\n" +
                 "        \n" +
                 "        <!-- Left Sidebar Navigation -->\n" +
-                "        <aside id=\"sidebar\" class=\"w-80 h-full glass-panel flex flex-col transition-all duration-300 ease-in-out relative z-30 transform translate-x-0 overflow-hidden\">\n" +
+                "        <aside id=\"sidebar\" class=\"w-80 h-full glass-panel flex flex-col transition-all duration-300 ease-in-out relative z-30 transform translate-x-0 overflow-hidden\">\n"
+                +
                 "            <!-- Sidebar Header -->\n" +
                 "            <div class=\"p-5 border-b border-white/20 flex flex-col gap-2.5\">\n" +
                 "                <div class=\"flex items-center justify-between w-full\">\n" +
                 "                    <div class=\"flex items-center gap-3\">\n" +
-                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-8 h-8 rounded-lg shadow-sm object-cover flex-shrink-0\">\n" +
-                "                        <span class=\"font-bold text-lg tracking-wide text-slate-800\">YuktiBharat</span>\n" +
+                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-8 h-8 rounded-lg shadow-sm object-cover flex-shrink-0\">\n"
+                +
+                "                        <span class=\"font-bold text-lg tracking-wide text-slate-800\">YuktiBharat</span>\n"
+                +
                 "                    </div>\n" +
                 "                    <!-- Hide Sidebar Button -->\n" +
-                "                    <button id=\"toggle-sidebar-btn\" class=\"p-1.5 rounded-lg hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-colors\">\n" +
+                "                    <button id=\"toggle-sidebar-btn\" class=\"p-1.5 rounded-lg hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-colors\">\n"
+                +
                 "                        <i data-lucide=\"chevrons-left\" class=\"w-5 h-5\"></i>\n" +
                 "                    </button>\n" +
                 "                </div>\n" +
                 "                <!-- Tagline -->\n" +
-                "                <div class=\"text-[10px] font-medium text-slate-400 tracking-wider uppercase pl-1.5\">\n" +
+                "                <div class=\"text-[10px] font-medium text-slate-400 tracking-wider uppercase pl-1.5\">\n"
+                +
                 "                    Fixing India with Ideas\n" +
                 "                </div>\n" +
                 "            </div>\n" +
@@ -435,24 +455,29 @@ public class Server {
                 "            <!-- Search Bar -->\n" +
                 "            <div class=\"p-4\">\n" +
                 "                <div class=\"relative flex items-center\">\n" +
-                "                    <i data-lucide=\"search\" class=\"w-4 h-4 absolute left-3 text-slate-400\"></i>\n" +
-                "                    <input type=\"text\" id=\"search-posts\" placeholder=\"Search entries...\" class=\"w-full bg-white/40 border border-white/40 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-slate-400 focus:bg-white/60 transition-all placeholder-slate-400\">\n" +
+                "                    <i data-lucide=\"search\" class=\"w-4 h-4 absolute left-3 text-slate-400\"></i>\n"
+                +
+                "                    <input type=\"text\" id=\"search-posts\" placeholder=\"Search entries...\" class=\"w-full bg-white/40 border border-white/40 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-slate-400 focus:bg-white/60 transition-all placeholder-slate-400\">\n"
+                +
                 "                </div>\n" +
                 "            </div>\n" +
                 "\n" +
                 "            <!-- Scrollable Post List -->\n" +
-                "            <div class=\"flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar\" id=\"posts-list\">\n" +
+                "            <div class=\"flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar\" id=\"posts-list\">\n"
+                +
                 sidebarHtml +
                 "            </div>\n" +
                 "\n" +
                 "            <!-- Footer -->\n" +
                 "            <div class=\"p-4 border-t border-white/20 text-center\">\n" +
-                "                <span class=\"text-[10px] text-slate-400 font-mono\">&copy; 2026 YuktiBharat</span>\n" +
+                "                <span class=\"text-[10px] text-slate-400 font-mono\">&copy; 2026 YuktiBharat</span>\n"
+                +
                 "            </div>\n" +
                 "        </aside>\n" +
                 "\n" +
                 "        <!-- Floating Sidebar Toggle Trigger -->\n" +
-                "        <button id=\"floating-menu-btn\" class=\"hidden absolute top-4 left-4 z-40 p-2.5 rounded-xl glass-panel shadow-md text-slate-700 hover:bg-white/50 active:scale-95 transition-all\">\n" +
+                "        <button id=\"floating-menu-btn\" class=\"hidden absolute top-4 left-4 z-40 p-2.5 rounded-xl glass-panel shadow-md text-slate-700 hover:bg-white/50 active:scale-95 transition-all\">\n"
+                +
                 "            <i data-lucide=\"menu\" class=\"w-6 h-6\"></i>\n" +
                 "        </button>\n" +
                 "\n" +
@@ -460,18 +485,23 @@ public class Server {
                 "        <main class=\"flex-1 h-full flex flex-col overflow-hidden relative\">\n" +
                 "            \n" +
                 "            <!-- Top Header Bar -->\n" +
-                "            <header class=\"h-16 px-6 glass-panel border-b border-white/20 flex items-center justify-between relative z-20\">\n" +
+                "            <header class=\"h-16 px-6 glass-panel border-b border-white/20 flex items-center justify-between relative z-20\">\n"
+                +
                 "                <div class=\"flex items-center gap-4\">\n" +
                 "                    <div id=\"header-spacer\" class=\"w-0 transition-all duration-300\"></div>\n" +
-                "                    <div id=\"header-brand\" class=\"flex items-center gap-2.5 opacity-0 w-0 overflow-hidden transition-all duration-300\">\n" +
-                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-7 h-7 rounded-lg shadow-sm object-cover flex-shrink-0\">\n" +
-                "                        <span class=\"font-bold text-base tracking-wide text-slate-800\">YuktiBharat</span>\n" +
+                "                    <div id=\"header-brand\" class=\"flex items-center gap-2.5 opacity-0 w-0 overflow-hidden transition-all duration-300\">\n"
+                +
+                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-7 h-7 rounded-lg shadow-sm object-cover flex-shrink-0\">\n"
+                +
+                "                        <span class=\"font-bold text-base tracking-wide text-slate-800\">YuktiBharat</span>\n"
+                +
                 "                    </div>\n" +
                 "                </div>\n" +
                 "            </header>\n" +
                 "\n" +
                 "            <!-- Content Viewport -->\n" +
-                "            <div class=\"flex-1 overflow-y-auto py-16 px-8 flex justify-center items-center custom-scrollbar bg-paper-dark/30 relative z-10\" id=\"editor-viewport\">\n" +
+                "            <div class=\"flex-1 overflow-y-auto py-16 px-8 flex justify-center items-center custom-scrollbar bg-paper-dark/30 relative z-10\" id=\"editor-viewport\">\n"
+                +
                 centerHtml +
                 "            </div>\n" +
                 "        </main>\n" +
@@ -542,14 +572,16 @@ public class Server {
             // Serve the latest post as a preview card on the landing index page
             PublishedPost latest = allPublished.get(0);
             String sidebarHtml = generateSidebarHtml(allPublished, latest.id);
-            String template = getIndexTemplate(latest.title, latest.date, latest.content, latest.font, latest.theme, sidebarHtml, latest.id);
+            String template = getIndexTemplate(latest.title, latest.date, latest.content, latest.font, latest.theme,
+                    sidebarHtml, latest.id);
             Files.writeString(Paths.get("./index.html"), template, StandardCharsets.UTF_8);
         } else {
             // Default blank state page
             String welcomeHtml = "<p>Welcome! This site has no published posts yet.</p>" +
                     "<p>Open <a href=\"editor.html\" class=\"text-blue-500 hover:underline\">editor.html</a> locally to write and publish your first story!</p>";
             String sidebarHtml = generateSidebarHtml(new ArrayList<>(), "");
-            String template = getReaderTemplate("Welcome to Paper-Glass Blog", "", welcomeHtml, "serif", "cream", sidebarHtml);
+            String template = getReaderTemplate("Welcome to Paper-Glass Blog", "", welcomeHtml, "serif", "cream",
+                    sidebarHtml);
             Files.writeString(Paths.get("./index.html"), template, StandardCharsets.UTF_8);
         }
     }
@@ -560,7 +592,8 @@ public class Server {
     }
 
     // Reader HTML Template matching the editor's visual layout
-    private static String getReaderTemplate(String title, String date, String content, String font, String theme, String sidebarHtml) {
+    private static String getReaderTemplate(String title, String date, String content, String font, String theme,
+            String sidebarHtml) {
         return "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -597,13 +630,15 @@ public class Server {
                 "    <!-- Google Fonts -->\n" +
                 "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n" +
                 "    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n" +
-                "    <link href=\"https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400..700&display=swap\" rel=\"stylesheet\">\n" +
+                "    <link href=\"https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400..700&display=swap\" rel=\"stylesheet\">\n"
+                +
                 "    <!-- Lucide Icons CDN -->\n" +
                 "    <script src=\"https://unpkg.com/lucide@latest\"></script>\n" +
                 "    <!-- Custom Style Sheet -->\n" +
                 "    <link rel=\"stylesheet\" href=\"style.css\">\n" +
                 "</head>\n" +
-                "<body class=\"bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100\">\n" +
+                "<body class=\"bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100\">\n"
+                +
                 "    <!-- Subtle Paper Grain Overlay -->\n" +
                 "    <div class=\"paper-grain absolute inset-0 pointer-events-none z-[1]\"></div>\n" +
                 "\n" +
@@ -611,21 +646,26 @@ public class Server {
                 "    <div class=\"flex w-full h-screen relative z-[2]\">\n" +
                 "        \n" +
                 "        <!-- Left Sidebar Navigation -->\n" +
-                "        <aside id=\"sidebar\" class=\"w-80 h-full glass-panel flex flex-col transition-all duration-300 ease-in-out relative z-30 transform translate-x-0 overflow-hidden\">\n" +
+                "        <aside id=\"sidebar\" class=\"w-80 h-full glass-panel flex flex-col transition-all duration-300 ease-in-out relative z-30 transform translate-x-0 overflow-hidden\">\n"
+                +
                 "            <!-- Sidebar Header -->\n" +
                 "            <div class=\"p-5 border-b border-white/20 flex flex-col gap-2.5\">\n" +
                 "                <div class=\"flex items-center justify-between w-full\">\n" +
                 "                    <div class=\"flex items-center gap-3\">\n" +
-                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-8 h-8 rounded-lg shadow-sm object-cover flex-shrink-0\">\n" +
-                "                        <span class=\"font-bold text-lg tracking-wide text-slate-800\">YuktiBharat</span>\n" +
+                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-8 h-8 rounded-lg shadow-sm object-cover flex-shrink-0\">\n"
+                +
+                "                        <span class=\"font-bold text-lg tracking-wide text-slate-800\">YuktiBharat</span>\n"
+                +
                 "                    </div>\n" +
                 "                    <!-- Hide Sidebar Button -->\n" +
-                "                    <button id=\"toggle-sidebar-btn\" class=\"p-1.5 rounded-lg hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-colors\">\n" +
+                "                    <button id=\"toggle-sidebar-btn\" class=\"p-1.5 rounded-lg hover:bg-white/30 text-slate-600 hover:text-slate-900 transition-colors\">\n"
+                +
                 "                        <i data-lucide=\"chevrons-left\" class=\"w-5 h-5\"></i>\n" +
                 "                    </button>\n" +
                 "                </div>\n" +
                 "                <!-- Tagline -->\n" +
-                "                <div class=\"text-[10px] font-medium text-slate-400 tracking-wider uppercase pl-1.5\">\n" +
+                "                <div class=\"text-[10px] font-medium text-slate-400 tracking-wider uppercase pl-1.5\">\n"
+                +
                 "                    Fixing India with Ideas\n" +
                 "                </div>\n" +
                 "            </div>\n" +
@@ -633,24 +673,29 @@ public class Server {
                 "            <!-- Search Bar -->\n" +
                 "            <div class=\"p-4\">\n" +
                 "                <div class=\"relative flex items-center\">\n" +
-                "                    <i data-lucide=\"search\" class=\"w-4 h-4 absolute left-3 text-slate-400\"></i>\n" +
-                "                    <input type=\"text\" id=\"search-posts\" placeholder=\"Search entries...\" class=\"w-full bg-white/40 border border-white/40 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-slate-400 focus:bg-white/60 transition-all placeholder-slate-400\">\n" +
+                "                    <i data-lucide=\"search\" class=\"w-4 h-4 absolute left-3 text-slate-400\"></i>\n"
+                +
+                "                    <input type=\"text\" id=\"search-posts\" placeholder=\"Search entries...\" class=\"w-full bg-white/40 border border-white/40 rounded-xl py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-slate-400 focus:bg-white/60 transition-all placeholder-slate-400\">\n"
+                +
                 "                </div>\n" +
                 "            </div>\n" +
                 "\n" +
                 "            <!-- Scrollable Post List -->\n" +
-                "            <div class=\"flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar\" id=\"posts-list\">\n" +
+                "            <div class=\"flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar\" id=\"posts-list\">\n"
+                +
                 sidebarHtml +
                 "            </div>\n" +
                 "\n" +
                 "            <!-- Footer -->\n" +
                 "            <div class=\"p-4 border-t border-white/20 text-center\">\n" +
-                "                <span class=\"text-[10px] text-slate-400 font-mono\">&copy; 2026 YuktiBharat</span>\n" +
+                "                <span class=\"text-[10px] text-slate-400 font-mono\">&copy; 2026 YuktiBharat</span>\n"
+                +
                 "            </div>\n" +
                 "        </aside>\n" +
                 "\n" +
                 "        <!-- Floating Sidebar Toggle Trigger -->\n" +
-                "        <button id=\"floating-menu-btn\" class=\"hidden absolute top-4 left-4 z-40 p-2.5 rounded-xl glass-panel shadow-md text-slate-700 hover:bg-white/50 active:scale-95 transition-all\">\n" +
+                "        <button id=\"floating-menu-btn\" class=\"hidden absolute top-4 left-4 z-40 p-2.5 rounded-xl glass-panel shadow-md text-slate-700 hover:bg-white/50 active:scale-95 transition-all\">\n"
+                +
                 "            <i data-lucide=\"menu\" class=\"w-6 h-6\"></i>\n" +
                 "        </button>\n" +
                 "\n" +
@@ -658,34 +703,44 @@ public class Server {
                 "        <main class=\"flex-1 h-full flex flex-col overflow-hidden relative\">\n" +
                 "            \n" +
                 "            <!-- Top Header Bar -->\n" +
-                "            <header class=\"h-16 px-6 glass-panel border-b border-white/20 flex items-center justify-between relative z-20\">\n" +
+                "            <header class=\"h-16 px-6 glass-panel border-b border-white/20 flex items-center justify-between relative z-20\">\n"
+                +
                 "                <div class=\"flex items-center gap-4\">\n" +
                 "                    <div id=\"header-spacer\" class=\"w-0 transition-all duration-300\"></div>\n" +
-                "                    <div id=\"header-brand\" class=\"flex items-center gap-2.5 opacity-0 w-0 overflow-hidden transition-all duration-300\">\n" +
-                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-7 h-7 rounded-lg shadow-sm object-cover flex-shrink-0\">\n" +
-                "                        <span class=\"font-bold text-base tracking-wide text-slate-800\">YuktiBharat</span>\n" +
+                "                    <div id=\"header-brand\" class=\"flex items-center gap-2.5 opacity-0 w-0 overflow-hidden transition-all duration-300\">\n"
+                +
+                "                        <img src=\"logo.png\" alt=\"YuktiBharat Logo\" class=\"w-7 h-7 rounded-lg shadow-sm object-cover flex-shrink-0\">\n"
+                +
+                "                        <span class=\"font-bold text-base tracking-wide text-slate-800\">YuktiBharat</span>\n"
+                +
                 "                    </div>\n" +
                 "                </div>\n" +
                 "            </header>\n" +
                 "\n" +
                 "            <!-- Reader Content Area (FIXED: items-start added here) -->\n" +
-                "            <div class=\"flex-1 overflow-y-auto py-12 px-6 flex justify-center items-start custom-scrollbar bg-paper-dark/30 relative z-10\" id=\"editor-viewport\">\n" +
+                "            <div class=\"flex-1 overflow-y-auto py-12 px-6 flex justify-center items-start custom-scrollbar bg-paper-dark/30 relative z-10\" id=\"editor-viewport\">\n"
+                +
                 "                <!-- Ruled Paper Sheet -->\n" +
-                "                <article id=\"paper-sheet\" class=\"w-full max-w-5xl min-h-[85vh] bg-paper-light shadow-xl rounded-2xl border border-slate-200/50 flex flex-col relative py-12 theme-" + theme + " font-" + font + "\">\n" +
+                "                <article id=\"paper-sheet\" class=\"w-full max-w-5xl min-h-[85vh] bg-paper-light shadow-xl rounded-2xl border border-slate-200/50 flex flex-col relative py-12 theme-"
+                + theme + " font-" + font + "\">\n" +
                 "                    \n" +
                 "                    <!-- Paper Vertical Margin Line (Red) -->\n" +
-                "                    <div class=\"absolute top-0 bottom-0 left-[79px] w-[1px] bg-red-300 pointer-events-none z-10\"></div>\n" +
+                "                    <div class=\"absolute top-0 bottom-0 left-[79px] w-[1px] bg-red-300 pointer-events-none z-10\"></div>\n"
+                +
                 "                    \n" +
                 "                    <div class=\"flex flex-col flex-1 pl-[96px] pr-12 relative z-20\">\n" +
-                "                        <h1 class=\"font-bold text-4xl mb-6 outline-none text-slate-900 leading-tight\">" + title + "</h1>\n" +
+                "                        <h1 class=\"font-bold text-4xl mb-6 outline-none text-slate-900 leading-tight\">"
+                + title + "</h1>\n" +
                 "                        \n" +
                 "                        <!-- Metadata Line -->\n" +
-                "                        <div class=\"flex items-center gap-4 text-xs font-mono text-slate-400 mb-8 border-b border-dashed border-slate-200 pb-3\">\n" +
+                "                        <div class=\"flex items-center gap-4 text-xs font-mono text-slate-400 mb-8 border-b border-dashed border-slate-200 pb-3\">\n"
+                +
                 "                            <span>" + date + "</span>\n" +
                 "                        </div>\n" +
                 "\n" +
                 "                        <!-- Article Content -->\n" +
-                "                        <div id=\"editor-body\" class=\"text-lg leading-[2rem] outline-none text-slate-800 flex-1\">\n" +
+                "                        <div id=\"editor-body\" class=\"text-lg leading-[2rem] outline-none text-slate-800 flex-1\">\n"
+                +
                 "                            " + content + "\n" +
                 "                        </div>\n" +
                 "                    </div>\n" +
@@ -756,14 +811,17 @@ public class Server {
     private static String extractJsonField(String json, String field) {
         String key = "\"" + field + "\"";
         int startIdx = json.indexOf(key);
-        if (startIdx == -1) return "";
-        
+        if (startIdx == -1)
+            return "";
+
         int colonIdx = json.indexOf(":", startIdx + key.length());
-        if (colonIdx == -1) return "";
-        
+        if (colonIdx == -1)
+            return "";
+
         int quoteIdx = json.indexOf("\"", colonIdx + 1);
-        if (quoteIdx == -1) return "";
-        
+        if (quoteIdx == -1)
+            return "";
+
         StringBuilder sb = new StringBuilder();
         boolean escaped = false;
         for (int i = quoteIdx + 1; i < json.length(); i++) {

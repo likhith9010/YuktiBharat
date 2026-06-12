@@ -136,6 +136,7 @@ function loadPostIntoEditor(postId) {
     // Set Editor elements
     document.getElementById('editor-title').textContent = post.title || '';
     document.getElementById('editor-body').innerHTML = post.content || '';
+    makeFiguresDraggable();
     document.getElementById('post-date').textContent = post.createdAt;
     
     // Theme selection applied locally to paper theme class
@@ -485,9 +486,6 @@ function setupEventListeners() {
         triggerAutosave();
     }
 
-    document.getElementById('insert-p-btn').addEventListener('click', () => {
-        insertBlockElement('<p>New paragraph here...</p>');
-    });
     document.getElementById('insert-h2-btn').addEventListener('click', () => {
         insertBlockElement('<h2>Section Subtitle</h2><p></p>');
     });
@@ -503,6 +501,122 @@ function setupEventListeners() {
     document.getElementById('insert-code-btn').addEventListener('click', () => {
         insertBlockElement('<pre><code>// Enter code here\nconsole.log("Paper-Glass Editor!");</code></pre><p></p>');
     });
+
+    // ── Image Insert Modal ─────────────────────────────────
+    const imageModal   = document.getElementById('image-modal');
+    const imgFileInput = document.getElementById('img-file-input');
+    const imgUrlInput  = document.getElementById('img-url-input');
+    const imgAltInput  = document.getElementById('img-alt-input');
+
+    // Size controls references
+    const imgPreviewContainer = document.getElementById('img-preview-container');
+    const imgPreview          = document.getElementById('img-preview');
+    const imgWidthPreviewVal  = document.getElementById('img-width-preview-val');
+    const imgWidthSlider      = document.getElementById('img-width-slider');
+    const imgWidthLabel       = document.getElementById('img-width-label');
+    const imgSizePresets      = document.querySelectorAll('.img-size-preset');
+
+    let _savedRange    = null;
+
+    function openImageModal() {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) _savedRange = sel.getRangeAt(0).cloneRange();
+        imgFileInput.value = '';
+        imgUrlInput.value  = '';
+        imgAltInput.value  = '';
+
+        // Reset slider and preview state
+        imgWidthSlider.value = '100';
+        imgWidthLabel.textContent = '100%';
+        imgWidthPreviewVal.textContent = '100';
+        imgPreviewContainer.classList.add('hidden');
+        imgPreview.src = '';
+        imgPreview.style.width = '100%';
+
+        imageModal.classList.remove('hidden');
+        lucide.createIcons();
+    }
+    function closeImageModal() {
+        imageModal.classList.add('hidden');
+    }
+
+    function updateImagePreview(src) {
+        if (src) {
+            imgPreview.src = src;
+            imgPreviewContainer.classList.remove('hidden');
+            imgPreview.style.width = imgWidthSlider.value + '%';
+        } else {
+            imgPreviewContainer.classList.add('hidden');
+            imgPreview.src = '';
+        }
+    }
+
+    function doInsertImage(src) {
+        if (!src) return;
+        const alt = imgAltInput.value.trim() || 'Image';
+        const width = imgWidthSlider.value;
+        const imgHtml = `<figure draggable="true" style="margin:16px 0;text-align:center;"><img src="${src}" alt="${alt}" style="width:${width}%;max-width:100%;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.10);display:inline-block;"><figcaption style="font-size:.82em;color:#94a3b8;margin-top:6px;">${alt}</figcaption></figure><p></p>`;
+        const editorBody = document.getElementById('editor-body');
+        editorBody.focus();
+        
+        let targetRange = null;
+        if (_savedRange) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(_savedRange);
+            targetRange = _savedRange;
+        }
+
+        insertHtmlAtRange(imgHtml, targetRange);
+        makeFiguresDraggable();
+        triggerAutosave();
+        closeImageModal();
+    }
+
+    document.getElementById('insert-image-btn').addEventListener('click', openImageModal);
+    document.getElementById('close-image-modal').addEventListener('click', closeImageModal);
+    document.getElementById('cancel-image-btn').addEventListener('click', closeImageModal);
+    imageModal.addEventListener('click', (e) => { if (e.target === imageModal) closeImageModal(); });
+
+    imgFileInput.addEventListener('change', () => {
+        const file = imgFileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            imgUrlInput.value = ev.target.result;
+            updateImagePreview(ev.target.result);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    imgUrlInput.addEventListener('input', () => {
+        updateImagePreview(imgUrlInput.value.trim());
+    });
+
+    imgWidthSlider.addEventListener('input', () => {
+        const val = imgWidthSlider.value;
+        imgWidthLabel.textContent = val + '%';
+        imgWidthPreviewVal.textContent = val;
+        imgPreview.style.width = val + '%';
+    });
+
+    imgSizePresets.forEach(preset => {
+        preset.addEventListener('click', (e) => {
+            e.preventDefault();
+            const percent = preset.dataset.percent;
+            imgWidthSlider.value = percent;
+            imgWidthLabel.textContent = percent + '%';
+            imgWidthPreviewVal.textContent = percent;
+            imgPreview.style.width = percent + '%';
+        });
+    });
+
+    document.getElementById('confirm-image-btn').addEventListener('click', () => {
+        const src = imgUrlInput.value.trim();
+        if (!src) { showToast('Please select or paste an image source.', 'error'); return; }
+        doInsertImage(src);
+    });
+
 
     // Settings Modal open/close
     const settingsBtn = document.getElementById('settings-btn');
@@ -760,12 +874,12 @@ function setupEventListeners() {
                 
                 formatToolbar.style.top = `${rect.top + window.scrollY - 10}px`;
                 formatToolbar.style.left = `${rect.left + window.scrollX + (rect.width / 2)}px`;
-                formatToolbar.classList.add('show');
+                formatToolbar.classList.remove('hidden');
                 updateActiveFontButtonHighlight();
                 return;
             }
         }
-        formatToolbar.classList.remove('show');
+        formatToolbar.classList.add('hidden');
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
             if (editorBody.contains(range.commonAncestorContainer)) {
@@ -781,13 +895,17 @@ function setupEventListeners() {
     }
 
     const toolbarButtons = [
-        { id: 'btn-bold', cmd: 'bold' },
-        { id: 'btn-italic', cmd: 'italic' },
-        { id: 'btn-heading-1', cmd: 'formatBlock', val: 'H1' },
-        { id: 'btn-heading-2', cmd: 'formatBlock', val: 'H2' },
-        { id: 'btn-quote', cmd: 'formatBlock', val: 'blockquote' },
-        { id: 'btn-ul', cmd: 'insertUnorderedList' },
-        { id: 'btn-ol', cmd: 'insertOrderedList' }
+        { id: 'btn-bold',         cmd: 'bold' },
+        { id: 'btn-italic',       cmd: 'italic' },
+        { id: 'btn-heading-1',    cmd: 'formatBlock', val: 'H1' },
+        { id: 'btn-heading-2',    cmd: 'formatBlock', val: 'H2' },
+        { id: 'btn-quote',        cmd: 'formatBlock', val: 'blockquote' },
+        { id: 'btn-ul',           cmd: 'insertUnorderedList' },
+        { id: 'btn-ol',           cmd: 'insertOrderedList' },
+        { id: 'btn-align-left',   cmd: 'justifyLeft' },
+        { id: 'btn-align-center', cmd: 'justifyCenter' },
+        { id: 'btn-align-right',  cmd: 'justifyRight' },
+        { id: 'btn-align-justify',cmd: 'justifyFull' }
     ];
 
     toolbarButtons.forEach(btn => {
@@ -800,10 +918,549 @@ function setupEventListeners() {
         }
     });
 
+    // Sidebar Alignment Buttons
+    const sidebarAlignButtons = [
+        { id: 'sidebar-align-left',    cmd: 'justifyLeft' },
+        { id: 'sidebar-align-center',  cmd: 'justifyCenter' },
+        { id: 'sidebar-align-right',   cmd: 'justifyRight' },
+        { id: 'sidebar-align-justify', cmd: 'justifyFull' }
+    ];
+    sidebarAlignButtons.forEach(btn => {
+        const el = document.getElementById(btn.id);
+        if (el) {
+            el.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                applyFormat(btn.cmd);
+            });
+        }
+    });
+
+    // ── Highlighter Button ──────────────────────────────────────────
+    const highlightPicker = document.getElementById('highlight-picker');
+    const btnHighlight    = document.getElementById('btn-highlight');
+
+    btnHighlight.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        highlightPicker.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.hl-swatch').forEach(swatch => {
+        swatch.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const color = swatch.dataset.hl;
+            if (color === 'none') {
+                document.execCommand('hiliteColor', false, 'transparent');
+            } else {
+                document.execCommand('hiliteColor', false, color);
+            }
+            document.getElementById('editor-body').focus();
+            triggerAutosave();
+            highlightPicker.classList.add('hidden');
+        });
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        const wrap = document.getElementById('highlighter-wrap');
+        if (wrap && !wrap.contains(e.target)) {
+            highlightPicker.classList.add('hidden');
+        }
+    });
+
+    // ── Pencil Canvas Drawing Tool ─────────────────────────────────
+    const pencilCanvas    = document.getElementById('pencil-canvas');
+    const pencilCtx       = pencilCanvas.getContext('2d');
+    const pencilToggleBtn = document.getElementById('pencil-toggle-btn');
+    const pencilLabel     = document.getElementById('pencil-btn-label');
+    const pencilSizeInput = document.getElementById('pencil-size');
+    const paperSheet      = document.getElementById('paper-sheet');
+    const pencilCursor    = document.getElementById('pencil-cursor');
+    let pencilActive  = false;
+    let pencilDrawing = false;
+    let pencilColor   = '#1e293b';
+    let pencilSize    = 3;
+    let isEraserActive = false;
+
+    function resizePencilCanvas() {
+        const rect = paperSheet.getBoundingClientRect();
+        const dpr  = window.devicePixelRatio || 1;
+        const tmpC = document.createElement('canvas');
+        tmpC.width  = pencilCanvas.width;
+        tmpC.height = pencilCanvas.height;
+        tmpC.getContext('2d').drawImage(pencilCanvas, 0, 0);
+        pencilCanvas.width  = Math.floor(rect.width  * dpr);
+        pencilCanvas.height = Math.floor(rect.height * dpr);
+        pencilCanvas.style.width  = rect.width  + 'px';
+        pencilCanvas.style.height = rect.height + 'px';
+        pencilCtx.scale(dpr, dpr);
+        pencilCtx.drawImage(tmpC, 0, 0, rect.width, rect.height);
+        pencilCtx.lineCap  = 'round';
+        pencilCtx.lineJoin = 'round';
+    }
+    resizePencilCanvas();
+    window.addEventListener('resize', resizePencilCanvas);
+
+    pencilToggleBtn.addEventListener('click', () => {
+        pencilActive = !pencilActive;
+        if (pencilActive) {
+            pencilCanvas.style.pointerEvents = 'auto';
+            pencilCanvas.style.cursor = isEraserActive ? 'none' : 'crosshair';
+            document.getElementById('editor-body').style.pointerEvents = 'none';
+            pencilToggleBtn.style.background = 'rgba(30,41,59,0.85)';
+            pencilToggleBtn.style.color = '#fff';
+            pencilLabel.textContent = 'Disable Pencil';
+        } else {
+            pencilCanvas.style.pointerEvents = 'none';
+            pencilCanvas.style.cursor = 'default';
+            document.getElementById('editor-body').style.pointerEvents = '';
+            pencilToggleBtn.style.background = '';
+            pencilToggleBtn.style.color = '';
+            pencilLabel.textContent = 'Enable Pencil';
+            pencilCursor.style.display = 'none';
+        }
+    });
+
+    document.querySelectorAll('.pencil-color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', () => {
+            pencilColor = swatch.dataset.color;
+            isEraserActive = false;
+
+            document.querySelectorAll('.pencil-color-swatch').forEach(s => {
+                s.style.outline = '';
+                s.style.outlineOffset = '';
+            });
+            const eraserBtn = document.getElementById('pencil-eraser-btn');
+            if (eraserBtn) {
+                eraserBtn.style.outline = '';
+                eraserBtn.style.outlineOffset = '';
+            }
+
+            swatch.style.outline = '3px solid #1e293b';
+            swatch.style.outlineOffset = '2px';
+
+            pencilCursor.style.display = 'none';
+            if (pencilActive) {
+                pencilCanvas.style.cursor = 'crosshair';
+            }
+        });
+    });
+    // Mark first swatch active by default
+    const firstSwatch = document.querySelector('.pencil-color-swatch');
+    if (firstSwatch) { firstSwatch.style.outline = '3px solid #1e293b'; firstSwatch.style.outlineOffset = '2px'; }
+
+    const pencilEraserBtn = document.getElementById('pencil-eraser-btn');
+    if (pencilEraserBtn) {
+        pencilEraserBtn.addEventListener('click', () => {
+            isEraserActive = true;
+
+            document.querySelectorAll('.pencil-color-swatch').forEach(s => {
+                s.style.outline = '';
+                s.style.outlineOffset = '';
+            });
+            pencilEraserBtn.style.outline = '3px solid #1e293b';
+            pencilEraserBtn.style.outlineOffset = '2px';
+
+            if (pencilActive) {
+                pencilCanvas.style.cursor = 'none';
+            }
+        });
+    }
+
+    document.getElementById('pencil-clear-btn').addEventListener('click', () => {
+        pencilCtx.clearRect(0, 0, pencilCanvas.width, pencilCanvas.height);
+    });
+
+    pencilSizeInput.addEventListener('input', () => {
+        pencilSize = parseInt(pencilSizeInput.value, 10);
+        if (isEraserActive && pencilActive) {
+            const size = pencilSize * 2;
+            pencilCursor.style.width = size + 'px';
+            pencilCursor.style.height = size + 'px';
+        }
+    });
+
+    function getPencilPos(e) {
+        const rect = pencilCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function updateEraserCursor(pos) {
+        if (pencilActive && isEraserActive && pos) {
+            const size = pencilSize * 2;
+            pencilCursor.style.display = 'block';
+            pencilCursor.style.width = size + 'px';
+            pencilCursor.style.height = size + 'px';
+            pencilCursor.style.left = (pos.x - size / 2) + 'px';
+            pencilCursor.style.top = (pos.y - size / 2) + 'px';
+        } else {
+            pencilCursor.style.display = 'none';
+        }
+    }
+
+    pencilCanvas.addEventListener('mousedown', (e) => {
+        if (!pencilActive) return;
+        pencilDrawing = true;
+        const pos = getPencilPos(e);
+        if (isEraserActive) {
+            const size = pencilSize * 2;
+            pencilCtx.clearRect(pos.x - size / 2, pos.y - size / 2, size, size);
+            updateEraserCursor(pos);
+        } else {
+            pencilCtx.beginPath();
+            pencilCtx.moveTo(pos.x, pos.y);
+            pencilCtx.strokeStyle = pencilColor;
+            pencilCtx.lineWidth   = pencilSize;
+            pencilCtx.lineCap     = 'round';
+            pencilCtx.lineJoin    = 'round';
+        }
+    });
+    pencilCanvas.addEventListener('mousemove', (e) => {
+        if (!pencilActive) return;
+        const pos = getPencilPos(e);
+        if (isEraserActive) {
+            updateEraserCursor(pos);
+            if (pencilDrawing) {
+                const size = pencilSize * 2;
+                pencilCtx.clearRect(pos.x - size / 2, pos.y - size / 2, size, size);
+            }
+        } else {
+            pencilCursor.style.display = 'none';
+            if (pencilDrawing) {
+                pencilCtx.lineTo(pos.x, pos.y);
+                pencilCtx.stroke();
+            }
+        }
+    });
+    pencilCanvas.addEventListener('mouseup',    () => { pencilDrawing = false; });
+    pencilCanvas.addEventListener('mouseleave', () => { 
+        pencilDrawing = false; 
+        pencilCursor.style.display = 'none';
+    });
+    pencilCanvas.addEventListener('mouseenter', (e) => {
+        if (pencilActive && isEraserActive) {
+            const pos = getPencilPos(e);
+            updateEraserCursor(pos);
+        }
+    });
+    pencilCanvas.addEventListener('touchstart', (e) => {
+        if (!pencilActive) return;
+        e.preventDefault();
+        pencilDrawing = true;
+        const pos = getPencilPos(e);
+        if (isEraserActive) {
+            const size = pencilSize * 2;
+            pencilCtx.clearRect(pos.x - size / 2, pos.y - size / 2, size, size);
+        } else {
+            pencilCtx.beginPath();
+            pencilCtx.moveTo(pos.x, pos.y);
+            pencilCtx.strokeStyle = pencilColor;
+            pencilCtx.lineWidth   = pencilSize;
+        }
+    }, { passive: false });
+    pencilCanvas.addEventListener('touchmove', (e) => {
+        if (!pencilActive || !pencilDrawing) return;
+        e.preventDefault();
+        const pos = getPencilPos(e);
+        if (isEraserActive) {
+            const size = pencilSize * 2;
+            pencilCtx.clearRect(pos.x - size / 2, pos.y - size / 2, size, size);
+        } else {
+            pencilCtx.lineTo(pos.x, pos.y);
+            pencilCtx.stroke();
+        }
+    }, { passive: false });
+    pencilCanvas.addEventListener('touchend', () => { pencilDrawing = false; });
+
     document.getElementById('editor-body').addEventListener('keydown', (e) => {
         if (e.key === 'Tab') {
             e.preventDefault();
             document.execCommand('insertHTML', false, '&#9;&#9;');
+        }
+    });
+
+    // ── Image Drag-and-Drop & Action Toolbar ──────────────────────────────
+    let draggedElement = null;
+    let dropIndicator = null;
+    let activeFormatFigure = null;
+
+    function createDropIndicator() {
+        if (!dropIndicator) {
+            dropIndicator = document.createElement('div');
+            dropIndicator.id = 'editor-drop-indicator';
+            dropIndicator.style.width = '100%';
+            dropIndicator.style.height = '4px';
+            dropIndicator.style.backgroundColor = '#8b5cf6'; // Violet-500
+            dropIndicator.style.borderRadius = '2px';
+            dropIndicator.style.margin = '12px 0';
+            dropIndicator.style.transition = 'all 0.15s ease-in-out';
+            dropIndicator.setAttribute('contenteditable', 'false');
+        }
+        return dropIndicator;
+    }
+
+    const editorBody = document.getElementById('editor-body');
+
+    // Drag-and-drop mechanics
+    editorBody.addEventListener('dragstart', (e) => {
+        const figure = e.target.closest('figure');
+        if (figure) {
+            draggedElement = figure;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', 'dragged-figure');
+
+            // Lightweight SVG drag icon to bypass base64 rendering lag
+            try {
+                const dragIcon = new Image();
+                dragIcon.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%238b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+                e.dataTransfer.setDragImage(dragIcon, 24, 24);
+            } catch (err) {
+                console.error('Failed to set drag image:', err);
+            }
+
+            setTimeout(() => {
+                figure.style.opacity = '0.4';
+            }, 0);
+            
+            // Hide formatting toolbar during drag
+            const imgToolbar = document.getElementById('image-action-toolbar');
+            if (imgToolbar) imgToolbar.classList.add('hidden');
+        }
+    });
+
+    editorBody.addEventListener('dragend', (e) => {
+        if (draggedElement) {
+            draggedElement.style.opacity = '1';
+        }
+        if (dropIndicator && dropIndicator.parentNode) {
+            dropIndicator.parentNode.removeChild(dropIndicator);
+        }
+        draggedElement = null;
+    });
+
+    editorBody.addEventListener('dragover', (e) => {
+        if (!draggedElement) return;
+        e.preventDefault();
+
+        let target = e.target;
+        if (target === editorBody) {
+            const children = Array.from(editorBody.children).filter(c => c !== draggedElement && c !== dropIndicator);
+            let closest = null;
+            let closestOffset = Number.NEGATIVE_INFINITY;
+            children.forEach(child => {
+                const rect = child.getBoundingClientRect();
+                const offset = e.clientY - (rect.top + rect.height / 2);
+                if (offset < 0 && offset > closestOffset) {
+                    closestOffset = offset;
+                    closest = child;
+                }
+            });
+            const indicator = createDropIndicator();
+            if (closest) {
+                editorBody.insertBefore(indicator, closest);
+            } else {
+                editorBody.appendChild(indicator);
+            }
+            return;
+        }
+
+        const block = target.closest('#editor-body > *');
+        if (block && block !== draggedElement && block !== dropIndicator) {
+            const rect = block.getBoundingClientRect();
+            const relativeY = e.clientY - rect.top;
+            const indicator = createDropIndicator();
+            if (relativeY < rect.height / 2) {
+                editorBody.insertBefore(indicator, block);
+            } else {
+                editorBody.insertBefore(indicator, block.nextSibling);
+            }
+        }
+    });
+
+    editorBody.addEventListener('drop', (e) => {
+        if (!draggedElement) return;
+        e.preventDefault();
+
+        const indicator = createDropIndicator();
+        if (indicator.parentNode) {
+            indicator.parentNode.insertBefore(draggedElement, indicator);
+            indicator.parentNode.removeChild(indicator);
+        }
+
+        if (!draggedElement.nextSibling || draggedElement.nextSibling.tagName === 'FIGURE') {
+            const p = document.createElement('p');
+            p.innerHTML = '<br>';
+            draggedElement.parentNode.insertBefore(p, draggedElement.nextSibling);
+        }
+
+        triggerAutosave();
+    });
+
+    // Image clicked event to trigger floating toolbar
+    editorBody.addEventListener('click', (e) => {
+        const figure = e.target.closest('figure');
+        const isImg = e.target.tagName === 'IMG';
+        
+        if (figure || isImg) {
+            activeFormatFigure = figure || e.target.closest('figure');
+            if (activeFormatFigure) {
+                positionImageToolbar(activeFormatFigure);
+                const imgToolbar = document.getElementById('image-action-toolbar');
+                imgToolbar.classList.remove('hidden');
+                
+                // Hide normal text floating toolbar to avoid overlapping
+                const formatToolbar = document.getElementById('format-toolbar');
+                if (formatToolbar) formatToolbar.classList.add('hidden');
+            }
+        } else {
+            const imgToolbar = document.getElementById('image-action-toolbar');
+            if (imgToolbar && !imgToolbar.contains(e.target)) {
+                imgToolbar.classList.add('hidden');
+                activeFormatFigure = null;
+            }
+        }
+    });
+
+    // Position Image Toolbar above figure
+    function positionImageToolbar(figure) {
+        const imgToolbar = document.getElementById('image-action-toolbar');
+        if (!figure || !imgToolbar) return;
+        
+        const rect = figure.getBoundingClientRect();
+        imgToolbar.classList.remove('hidden');
+        const tbRect = imgToolbar.getBoundingClientRect();
+        
+        let top = rect.top + window.scrollY - 48;
+        let left = rect.left + window.scrollX + (rect.width - tbRect.width) / 2;
+        
+        if (top < window.scrollY + 10) {
+            top = rect.bottom + window.scrollY + 10;
+        }
+        
+        imgToolbar.style.top = top + 'px';
+        imgToolbar.style.left = Math.max(10, left) + 'px';
+
+        // Update active class on toolbar size buttons
+        updateImageToolbarSizeActive(figure);
+    }
+
+    // Floating Image Toolbar Buttons Listeners
+    document.getElementById('img-btn-move-up').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!activeFormatFigure) return;
+        const prev = activeFormatFigure.previousElementSibling;
+        if (prev) {
+            activeFormatFigure.parentNode.insertBefore(activeFormatFigure, prev);
+            positionImageToolbar(activeFormatFigure);
+            triggerAutosave();
+        }
+    });
+
+    document.getElementById('img-btn-move-down').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!activeFormatFigure) return;
+        const next = activeFormatFigure.nextElementSibling;
+        if (next) {
+            activeFormatFigure.parentNode.insertBefore(activeFormatFigure, next.nextElementSibling);
+            positionImageToolbar(activeFormatFigure);
+            triggerAutosave();
+        }
+    });
+
+    document.getElementById('img-btn-align-left').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!activeFormatFigure) return;
+        activeFormatFigure.style.textAlign = 'left';
+        activeFormatFigure.style.margin = '16px auto 16px 0';
+        triggerAutosave();
+    });
+
+    document.getElementById('img-btn-align-center').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!activeFormatFigure) return;
+        activeFormatFigure.style.textAlign = 'center';
+        activeFormatFigure.style.margin = '16px auto';
+        triggerAutosave();
+    });
+
+    document.getElementById('img-btn-align-right').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!activeFormatFigure) return;
+        activeFormatFigure.style.textAlign = 'right';
+        activeFormatFigure.style.margin = '16px 0 16px auto';
+        triggerAutosave();
+    });
+
+    document.getElementById('img-btn-delete').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!activeFormatFigure) return;
+        activeFormatFigure.parentNode.removeChild(activeFormatFigure);
+        document.getElementById('image-action-toolbar').classList.add('hidden');
+        activeFormatFigure = null;
+        triggerAutosave();
+    });
+
+    // Toolbar size buttons
+    document.querySelectorAll('.img-toolbar-size-btn').forEach(btn => {
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (!activeFormatFigure) return;
+            const img = activeFormatFigure.querySelector('img');
+            if (img) {
+                const percent = btn.dataset.percent;
+                img.style.width = percent + '%';
+                updateImageToolbarSizeActive(activeFormatFigure);
+                positionImageToolbar(activeFormatFigure);
+                triggerAutosave();
+            }
+        });
+    });
+
+    // Handle clicks outside figure/toolbar
+    document.addEventListener('mousedown', (e) => {
+        const imgToolbar = document.getElementById('image-action-toolbar');
+        if (imgToolbar && !imgToolbar.contains(e.target) && !e.target.closest('figure') && e.target.tagName !== 'IMG') {
+            imgToolbar.classList.add('hidden');
+            activeFormatFigure = null;
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (activeFormatFigure) positionImageToolbar(activeFormatFigure);
+    });
+
+    window.addEventListener('scroll', () => {
+        if (activeFormatFigure) positionImageToolbar(activeFormatFigure);
+    });
+}
+
+// Helper to make existing figures draggable
+function makeFiguresDraggable() {
+    const editorBody = document.getElementById('editor-body');
+    if (editorBody) {
+        editorBody.querySelectorAll('figure').forEach(fig => {
+            fig.setAttribute('draggable', 'true');
+        });
+    }
+}
+
+// Highlight the active size button in the toolbar
+function updateImageToolbarSizeActive(figure) {
+    if (!figure) return;
+    const img = figure.querySelector('img');
+    if (!img) return;
+
+    let width = img.style.width || '100%';
+    const percentVal = width.replace('%', '').trim();
+
+    document.querySelectorAll('.img-toolbar-size-btn').forEach(btn => {
+        const btnPercent = btn.dataset.percent;
+        if (btnPercent === percentVal) {
+            btn.classList.add('bg-white/30', 'text-white', 'font-extrabold');
+            btn.classList.remove('text-slate-200');
+        } else {
+            btn.classList.remove('bg-white/30', 'text-white', 'font-extrabold');
+            btn.classList.add('text-slate-200');
         }
     });
 }
@@ -920,4 +1577,30 @@ function showToast(message, type = 'success') {
             toast.remove();
         }, 300);
     }, 3500);
+}
+
+// Helper to insert HTML at a specific selection range
+function insertHtmlAtRange(html, range) {
+    const temp = document.createElement('div');
+    temp.innerHTML = html.trim();
+    const node = temp.firstChild;
+
+    if (!range) {
+        const editorBody = document.getElementById('editor-body');
+        editorBody.appendChild(node);
+        return node;
+    }
+
+    range.deleteContents();
+    range.insertNode(node);
+
+    // Position cursor after the inserted node
+    const nextRange = document.createRange();
+    nextRange.setStartAfter(node);
+    nextRange.setEndAfter(node);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(nextRange);
+
+    return node;
 }

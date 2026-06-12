@@ -11,4 +11,4 @@ Thumbs.db
 .vscode/
 
 # Data directory (blog post data - exclude if desired, or include)
-# data/
+data/

@@ -260,3 +260,35 @@ body, .bg-paper {
     margin-bottom: 0.25rem !important;
 }
 
+/* Sidebar Ad Panel */
+.sidebar-ad-container {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16rem; /* 256px wide */
+    height: 600px;
+    z-index: 20;
+    display: none;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 1.5rem;
+    padding: 1rem;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.03), 
+        0 2px 4px -1px rgba(0, 0, 0, 0.02),
+        0 10px 30px -10px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 1024px) {
+    body:not(.editor-page) #sidebar:not(.collapsed) ~ main .sidebar-ad-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+

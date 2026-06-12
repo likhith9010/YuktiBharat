@@ -226,3 +226,37 @@ body, .bg-paper {
     border-color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
+
+/* Prepare space for future ads on public blog pages by shifting layout left when sidebar is open */
+@media (min-width: 1024px) {
+    #editor-viewport {
+        transition: padding-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body:not(.editor-page) #sidebar:not(.collapsed) ~ main #editor-viewport {
+        padding-right: 18rem; /* Creates 288px of blank space on the right for future ads */
+    }
+
+    /* Ensure the paper sheet is exactly the same size on all desktop screens to prevent canvas drawing alignment issues */
+    #paper-sheet {
+        width: 850px !important;
+        min-width: 850px !important;
+        max-width: 850px !important;
+    }
+}
+
+/* List Styling overrides for Tailwind Preflight reset */
+#editor-body ul {
+    list-style-type: disc !important;
+    padding-left: 2rem !important;
+    margin-bottom: 1rem !important;
+}
+#editor-body ol {
+    list-style-type: decimal !important;
+    padding-left: 2rem !important;
+    margin-bottom: 1rem !important;
+}
+#editor-body li {
+    margin-bottom: 0.25rem !important;
+}
+

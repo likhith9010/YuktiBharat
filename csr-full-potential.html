@@ -125,30 +125,29 @@
                 </div>
             </header>
 
-            <!-- Content Viewport -->
-            <div class="flex-1 overflow-y-auto py-16 px-8 flex justify-center items-center custom-scrollbar bg-paper-dark/30 relative z-10" id="editor-viewport">
-                <!-- Summary Card Container -->
-                <div class="w-full max-w-3xl flex flex-col gap-6">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white/20 px-2.5 py-1 rounded-full self-start">Featured Story</span>
+            <!-- Reader Content Area (FIXED: items-start added here) -->
+            <div class="flex-1 overflow-y-auto py-12 px-6 flex justify-center items-start custom-scrollbar bg-paper-dark/30 relative z-10" id="editor-viewport">
+                <!-- Ruled Paper Sheet -->
+                <article id="paper-sheet" class="w-full max-w-5xl min-h-[85vh] bg-paper-light shadow-xl rounded-2xl border border-slate-200/50 flex flex-col relative py-12 theme-cream font-serif">
                     
-                    <!-- The Preview Card Rectangle with Shadow -->
-                    <div class="bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-2xl rounded-2xl p-10 hover:-translate-y-1 hover:shadow-slate-300/30 transition-all duration-300 flex flex-col gap-6">
-                        <h1 class="font-sans font-extrabold text-3xl text-slate-900 leading-tight">CSR: Full Potential</h1>
+                    <!-- Paper Vertical Margin Line (Red) -->
+                    <div class="absolute top-0 bottom-0 left-[79px] w-[1px] bg-red-300 pointer-events-none z-10"></div>
+                    
+                    <div class="flex flex-col flex-1 pl-[96px] pr-12 relative z-20">
+                        <h1 class="font-bold text-4xl mb-6 outline-none text-slate-900 leading-tight">CSR: Full Potential</h1>
                         
-                        <div class="flex items-center gap-3 text-xs font-mono text-slate-400 border-b border-dashed border-slate-200 pb-3">
+                        <!-- Metadata Line -->
+                        <div class="flex items-center gap-4 text-xs font-mono text-slate-400 mb-8 border-b border-dashed border-slate-200 pb-3">
                             <span>June 10, 2026</span>
                         </div>
-                        
-                        <p class="text-slate-600 text-lg leading-relaxed">In the previous blog we learned about CSR( Corporate Social Responsibility ), if you haven't read previous blog&nbsp; it's better to read that before you continue with this one, with that being said let's dive into this topic..&nbsp;&nbsp; Multiple SuperPACs In previous blog we talked about a School...</p>
-                        
-                        <div class="pt-4">
-                            <a href="csr-full-potential.html" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-medium text-sm hover:bg-slate-700 active:scale-[0.98] transition-all shadow-md">
-                                <span>Read Full Story</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </a>
+
+                        <!-- Article Content -->
+                        <div id="editor-body" class="text-lg leading-[2rem] outline-none text-slate-800 flex-1">
+                            <div style="text-align: justify;"><span style="background-color: initial; font-size: 1.1rem;">In the previous blog we learned about CSR( Corporate Social Responsibility ), if you haven't read previous blog&nbsp; it's better to read that before you continue with this one, with that being said let's dive into this topic..&nbsp;&nbsp;</span></div><div style="text-align: justify;"><span style="font-size: 1.35rem; font-weight: 600; background-color: initial;"><br></span></div><div style="text-align: justify;"><span style="font-size: 21.6px;"><b>Multiple SuperPACs</b></span></div><div style="text-align: justify;"><br></div><div style="text-align: justify;"><h1>In previous blog we talked about a <b>School Building</b> SuperPAC, but it need not be the only&nbsp;<span style="font-size: inherit; font-weight: inherit; background-color: initial;">one, currently I have an Idea of 4 SuperPACs including&nbsp;</span><span style="font-size: inherit; background-color: initial; --tw-translate-x: 0; --tw-translate-y: 0; --tw-rotate: 0; --tw-skew-x: 0; --tw-skew-y: 0; --tw-scale-x: 1; --tw-scale-y: 1; --tw-pan-x: ; --tw-pan-y: ; --tw-pinch-zoom: ; --tw-scroll-snap-strictness: proximity; --tw-gradient-from-position: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ; --tw-ordinal: ; --tw-slashed-zero: ; --tw-numeric-figure: ; --tw-numeric-spacing: ; --tw-numeric-fraction: ; --tw-ring-inset: ; --tw-ring-offset-width: 0px; --tw-ring-offset-color: #fff; --tw-ring-color: rgb(59 130 246 / 0.5); --tw-ring-offset-shadow: 0 0 #0000; --tw-ring-shadow: 0 0 #0000; --tw-shadow: 0 0 #0000; --tw-shadow-colored: 0 0 #0000; --tw-blur: ; --tw-brightness: ; --tw-contrast: ; --tw-grayscale: ; --tw-hue-rotate: ; --tw-invert: ; --tw-saturate: ; --tw-sepia: ; --tw-drop-shadow: ; --tw-backdrop-blur: ; --tw-backdrop-brightness: ; --tw-backdrop-contrast: ; --tw-backdrop-grayscale: ; --tw-backdrop-hue-rotate: ; --tw-backdrop-invert: ; --tw-backdrop-opacity: ; --tw-backdrop-saturate: ; --tw-backdrop-sepia: ; --tw-contain-size: ; --tw-contain-layout: ; --tw-contain-paint: ; --tw-contain-style: ; font-weight: bolder;">School Building</span><span style="font-size: inherit; font-weight: inherit; background-color: initial;"> </span><span style="font-size: inherit; font-weight: inherit; background-color: initial;">SuperPAC.&nbsp;</span><span style="background-color: initial; font-size: inherit; font-weight: inherit;">The next one I propose is </span><b style="background-color: initial; font-size: inherit;">Hospital Building</b><span style="background-color: initial; font-size: inherit; font-weight: inherit;"> SuperPAC. This Superpac should be used build Government Hospitals and run by retired government doctors and monitored by&nbsp;</span><span style="background-color: initial; font-size: inherit; font-weight: inherit;">the government like the previous one&nbsp; and&nbsp; I have also some ideas regarding&nbsp; </span><b style="background-color: initial; font-size: inherit;">Universal Health Care in India, Ayushman Cards,&nbsp;</b><span style="background-color: initial; font-size: inherit; font-weight: inherit;">and more that I will get into in&nbsp; another blog.</span></h1><div><br></div><div>Keeping this two aside Corporation/Companies who want to Collobrate and want to spend their funds on a particular social issue , should be able to do it . In my opinion the majority of superpacs should not be controlled by the government , only some like these two I mentioned above.&nbsp;</div><div><span style="font-size: inherit; background-color: initial;"><br></span></div><div><span style="font-size: inherit; background-color: initial;"><br></span></div></div>
                         </div>
                     </div>
-                </div>                <!-- Sidebar Ad Panel -->
+                </article>
+                <!-- Sidebar Ad Panel -->
                 <div class="sidebar-ad-container">
                     <span class="text-[9px] font-bold text-slate-400/60 uppercase tracking-widest mb-2">Advertisement</span>
                     <ins class="adsbygoogle"

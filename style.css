@@ -234,7 +234,7 @@ body, .bg-paper {
     }
 
     body:not(.editor-page) #sidebar:not(.collapsed) ~ main #editor-viewport {
-        padding-right: 18rem; /* Creates 288px of blank space on the right for future ads */
+        padding-right: 22rem; /* Creates 352px of blank space on the right for ads */
     }
 
     /* Ensure the paper sheet is exactly the same size on all desktop screens to prevent canvas drawing alignment issues */
@@ -266,8 +266,8 @@ body, .bg-paper {
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    width: 16rem; /* 256px wide */
-    height: 600px;
+    width: 20rem; /* 320px wide */
+    height: 700px;
     z-index: 20;
     display: none;
     background: rgba(255, 255, 255, 0.45);

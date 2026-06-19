@@ -418,9 +418,7 @@ public class Server {
                 "    <script src=\"https://unpkg.com/lucide@latest\"></script>\n" +
                 "    <!-- Custom Style Sheet -->\n" +
                 "    <link rel=\"stylesheet\" href=\"style.css\">\n" +
-                "    <!-- Google AdSense -->\n" +
-                "    <script async src=\"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5402704750924538\"\n" +
-                "     crossorigin=\"anonymous\"></script>\n" +
+
                 "</head>\n" +
                 "<body class=\"bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100\">\n"
                 +
@@ -506,19 +504,7 @@ public class Server {
                 "            <div class=\"flex-1 overflow-y-auto py-16 px-8 flex justify-center items-center custom-scrollbar bg-paper-dark/30 relative z-10\" id=\"editor-viewport\">\n"
                 +
                 centerHtml +
-                "                <!-- Sidebar Ad Panel -->\n" +
-                "                <div class=\"sidebar-ad-container\">\n" +
-                "                    <span class=\"text-[9px] font-bold text-slate-400/60 uppercase tracking-widest mb-2\">Advertisement</span>\n" +
-                "                    <ins class=\"adsbygoogle\"\n" +
-                "                         style=\"display:block;width:100%;height:100%;\"\n" +
-                "                         data-ad-client=\"ca-pub-5402704750924538\"\n" +
-                "                         data-ad-slot=\"5973319899\"\n" +
-                "                         data-ad-format=\"auto\"\n" +
-                "                         data-full-width-responsive=\"true\"></ins>\n" +
-                "                    <script>\n" +
-                "                         (adsbygoogle = window.adsbygoogle || []).push({});\n" +
-                "                    </script>\n" +
-                "                </div>\n" +
+
                 "            </div>\n" +
                 "        </main>\n" +
                 "    </div>\n" +
@@ -652,9 +638,7 @@ public class Server {
                 "    <script src=\"https://unpkg.com/lucide@latest\"></script>\n" +
                 "    <!-- Custom Style Sheet -->\n" +
                 "    <link rel=\"stylesheet\" href=\"style.css\">\n" +
-                "    <!-- Google AdSense -->\n" +
-                "    <script async src=\"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5402704750924538\"\n" +
-                "     crossorigin=\"anonymous\"></script>\n" +
+
                 "</head>\n" +
                 "<body class=\"bg-paper min-h-screen text-slate-800 font-sans flex overflow-hidden relative selection:bg-blue-100\">\n"
                 +
@@ -764,19 +748,7 @@ public class Server {
                 "                        </div>\n" +
                 "                    </div>\n" +
                 "                </article>\n" +
-                "                <!-- Sidebar Ad Panel -->\n" +
-                "                <div class=\"sidebar-ad-container\">\n" +
-                "                    <span class=\"text-[9px] font-bold text-slate-400/60 uppercase tracking-widest mb-2\">Advertisement</span>\n" +
-                "                    <ins class=\"adsbygoogle\"\n" +
-                "                         style=\"display:block;width:100%;height:100%;\"\n" +
-                "                         data-ad-client=\"ca-pub-5402704750924538\"\n" +
-                "                         data-ad-slot=\"5973319899\"\n" +
-                "                         data-ad-format=\"auto\"\n" +
-                "                         data-full-width-responsive=\"true\"></ins>\n" +
-                "                    <script>\n" +
-                "                         (adsbygoogle = window.adsbygoogle || []).push({});\n" +
-                "                    </script>\n" +
-                "                </div>\n" +
+
                 "            </div>\n" +
                 "        </main>\n" +
                 "    </div>\n" +

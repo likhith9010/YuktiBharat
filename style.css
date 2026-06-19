@@ -227,21 +227,17 @@ body, .bg-paper {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
-/* Prepare space for future ads on public blog pages by shifting layout left when sidebar is open */
+/* Ensure the paper sheet is exactly the same size on all desktop screens to prevent canvas drawing alignment issues */
 @media (min-width: 1024px) {
-    #editor-viewport {
-        transition: padding-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    body:not(.editor-page) #sidebar:not(.collapsed) ~ main #editor-viewport {
-        padding-right: 22rem; /* Creates 352px of blank space on the right for ads */
-    }
-
-    /* Ensure the paper sheet is exactly the same size on all desktop screens to prevent canvas drawing alignment issues */
     #paper-sheet {
         width: 850px !important;
         min-width: 850px !important;
         max-width: 850px !important;
+    }
+
+    /* Add extra right-side space when sidebar is open for visual balance */
+    body:not(.editor-page) #sidebar:not(.collapsed) ~ main #editor-viewport {
+        padding-right: 18rem;
     }
 }
 
@@ -258,37 +254,6 @@ body, .bg-paper {
 }
 #editor-body li {
     margin-bottom: 0.25rem !important;
-}
-
-/* Sidebar Ad Panel */
-.sidebar-ad-container {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20rem; /* 320px wide */
-    height: 700px;
-    z-index: 20;
-    display: none;
-    background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 1.5rem;
-    padding: 1rem;
-    box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.03), 
-        0 2px 4px -1px rgba(0, 0, 0, 0.02),
-        0 10px 30px -10px rgba(0, 0, 0, 0.05);
-}
-
-@media (min-width: 1024px) {
-    body:not(.editor-page) #sidebar:not(.collapsed) ~ main .sidebar-ad-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
 }
 
 

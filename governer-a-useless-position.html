@@ -134,30 +134,29 @@
                 </div>
             </header>
 
-            <!-- Content Viewport -->
-            <div class="flex-1 overflow-y-auto py-16 px-8 flex justify-center items-center custom-scrollbar bg-paper-dark/30 relative z-10" id="editor-viewport">
-                <!-- Summary Card Container -->
-                <div class="w-full max-w-3xl flex flex-col gap-6">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white/20 px-2.5 py-1 rounded-full self-start">Featured Story</span>
+            <!-- Reader Content Area (FIXED: items-start added here) -->
+            <div class="flex-1 overflow-y-auto py-12 px-6 flex justify-center items-start custom-scrollbar bg-paper-dark/30 relative z-10" id="editor-viewport">
+                <!-- Ruled Paper Sheet -->
+                <article id="paper-sheet" class="w-full max-w-5xl min-h-[85vh] bg-paper-light shadow-xl rounded-2xl border border-slate-200/50 flex flex-col relative py-12 theme-cream font-serif">
                     
-                    <!-- The Preview Card Rectangle with Shadow -->
-                    <div class="bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-2xl rounded-2xl p-10 hover:-translate-y-1 hover:shadow-slate-300/30 transition-all duration-300 flex flex-col gap-6">
-                        <h1 class="font-sans font-extrabold text-3xl text-slate-900 leading-tight">Governer : A Useless Position</h1>
+                    <!-- Paper Vertical Margin Line (Red) -->
+                    <div class="absolute top-0 bottom-0 left-[79px] w-[1px] bg-red-300 pointer-events-none z-10"></div>
+                    
+                    <div class="flex flex-col flex-1 pl-[96px] pr-12 relative z-20">
+                        <h1 class="font-bold text-4xl mb-6 outline-none text-slate-900 leading-tight">Governer : A Useless Position</h1>
                         
-                        <div class="flex items-center gap-3 text-xs font-mono text-slate-400 border-b border-dashed border-slate-200 pb-3">
+                        <!-- Metadata Line -->
+                        <div class="flex items-center gap-4 text-xs font-mono text-slate-400 mb-8 border-b border-dashed border-slate-200 pb-3">
                             <span>July 3, 2026</span>
                         </div>
-                        
-                        <p class="text-slate-600 text-lg leading-relaxed">In a democracy, every constitutional office is expected to serve a purpose. Yet, some positions gradually lose their relevance as political systems evolve. The Governor is one such position, caught between ceremonial duties and real power. It is also caught between increasing politicization and, mor...</p>
-                        
-                        <div class="pt-4">
-                            <a href="governer-a-useless-position.html" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-medium text-sm hover:bg-slate-700 active:scale-[0.98] transition-all shadow-md">
-                                <span>Read Full Story</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </a>
+
+                        <!-- Article Content -->
+                        <div id="editor-body" class="text-lg leading-[2rem] outline-none text-slate-800 flex-1">
+                            <h1><span style="background-color: initial; font-size: 1.1rem;">In a democracy, every constitutional office is expected to serve a purpose. Yet, some positions gradually lose their relevance as political systems evolve. The Governor is one such position, caught between ceremonial duties and real power. It is also caught between increasing politicization and, more importantly, serving little practical purpose in most situations. In this blog, we will understand the position of the Governor, examine the problems associated with it, and finally discuss the changes needed to improve India's democracy.</span></h1><h2>1. Who and What is a Governor?</h2><p>A Governor is the <b>constitutional head of a state</b>, appointed by the President of India. Unlike the Chief Minister, who is elected by the people, the Governor is a nominated authority responsible for ensuring that the state government functions according to the Constitution. The Governor gives assent to bills passed by the state legislature, appoints the Chief Minister, summons and dissolves the legislative assembly, and can recommend President's Rule in exceptional situations.</p><p>On paper, these responsibilities appear significant. The Governor is expected to act as an impartial link between the Union and the State, safeguarding constitutional values rather than political interests. However, in practice, the office rarely exercises independent authority and usually acts on the advice of the elected government. This raises an important question: if most powers are ceremonial, is the position truly necessary?</p><h2>2. Problems with the Position</h2><p>The biggest criticism of the Governor's office is its <b>increasing politicization</b>. Since Governors are appointed by the central government, accusations often arise that they act in favor of the ruling party at the national level instead of remaining politically neutral. Controversies over inviting parties to form governments, delaying assent to state bills, or recommending <b>President's Rule</b> have repeatedly sparked constitutional debates.</p><p>Another issue is the overlap of responsibilities. The elected Chief Minister and Council of Ministers already administer the state. Maintaining an additional constitutional head with limited executive powers results in unnecessary administrative expenses and bureaucratic delays. Critics argue that taxpayers bear the cost of maintaining Raj Bhavans, staff, security, and official ceremonies without receiving proportional benefits.</p><p>Moreover, the ambiguity surrounding discretionary powers often creates conflicts between state governments and Governors. Different interpretations of constitutional provisions have led to legal battles and strained Centre-State relations. Instead of acting as a bridge, the office sometimes becomes a source of political confrontation.</p><p>To solve the problems of impartiality, the ceremonial nature of the office, and its role as a proxy for the ruling party, while making the position genuinely useful, I suggest the following changes.</p><h2>3. Solutions</h2><p><ul><li>The position of the Governor should be transformed from a political office into a bureaucratic one, shifting its role away from the legislature and into the executive branch of the government.</li><li>The Governor should become the head of all <b>District Magistrates (DMs)</b> within the state and work directly under the Lieutenant Governor.</li><li>The Lieutenant Governor should remain the Governor of Delhi while also serving as the head of all Governors and District Magistrates across the country.</li><li>The <b>Lieutenant Governor</b> should be accountable only to the President and act as the de facto head of the executive branch.</li><li>This structure would ensure that every state has a Chief Justice of the High Court as the head of the judiciary, the Chief Minister as the head of the legislature, and the Governor as the head of the executive branch, working alongside the state's <b>Director General of Police (DGP)</b>.</li><li>Such a structure would also enable the DGP, Governor, and Chief Justice to act as institutional checks on the powers of the Chief Minister, helping maintain a healthier balance of power and strengthening India's democratic system.</li></ul></p><div><div><span style="background-color: initial; font-size: 1.1rem;"><br>&nbsp;&nbsp;</span></div></div>
                         </div>
                     </div>
-                </div>                <!-- Sidebar Ad Panel -->
+                </article>
+                <!-- Sidebar Ad Panel -->
                 <div class="sidebar-ad-container">
                     <span class="text-[9px] font-bold text-slate-400/60 uppercase tracking-widest mb-2">Advertisement</span>
                     <ins class="adsbygoogle"
